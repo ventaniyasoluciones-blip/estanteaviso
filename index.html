@@ -1,1027 +1,546 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>VENTANIYA — Cartelera de Estampillas Selladas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartelera VentaniYA - Estante Aviso</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-white: #ffffff;
+            --neon-pink: #ff007f;
+            --bg-dark: #050814;
+            --panel-bg: #0b1120;
+            --border-glow: 0 0 15px rgba(0, 243, 255, 0.4);
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-<style>
-:root{
-  --cyan:#00f3ff;
-  --pink:#ff007f;
-  --blue:#0077ff;
-  --bg:#050814;
-  --panel:#0b1120;
-  --line:#17304a;
-  --text:#fff;
-  --muted:#8ab4f8;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:'Share Tech Mono',monospace;
-  min-height:100vh;
-}
-header{
-  padding:14px 22px;
-  border-bottom:2px solid var(--cyan);
-  box-shadow:0 0 18px #00f3ff55;
-  display:flex;
-  justify-content:space-between;
-  gap:15px;
-  align-items:center;
-  flex-wrap:wrap;
-}
-h1,.section-title,.editor-title{
-  font-family:Orbitron,sans-serif;
-}
-h1{
-  font-size:1.35rem;
-  color:var(--cyan);
-  text-shadow:0 0 8px var(--cyan);
-}
-.brand p{color:var(--muted);font-size:.75rem;margin-top:4px}
-.clock{
-  background:#000;
-  border:1px solid var(--cyan);
-  padding:7px 12px;
-  text-align:right;
-  min-width:190px;
-}
-#live-time{font-family:Orbitron;font-size:1.35rem;color:var(--cyan)}
-#live-date{font-size:.72rem;margin-top:2px}
+    body {
+        background-color: var(--bg-dark);
+        color: var(--neon-white);
+        font-family: 'Share Tech Mono', monospace;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
 
-.layout{
-  max-width:1900px;
-  margin:auto;
-  padding:18px;
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 430px;
-  gap:18px;
-}
-@media(max-width:1100px){.layout{grid-template-columns:1fr}}
-.section-title{
-  color:var(--cyan);
-  border-left:4px solid var(--cyan);
-  padding-left:9px;
-  margin-bottom:10px;
-  font-size:1rem;
-}
-.counter{
-  color:var(--muted);
-  font-size:.7rem;
-  margin-bottom:8px;
-}
-.wall{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
-  gap:10px;
-  background:#000;
-  border:2px solid var(--cyan);
-  border-radius:8px;
-  padding:12px;
-  max-height:78vh;
-  overflow:auto;
-}
-.card{
-  background:var(--panel);
-  border:1px solid #20354c;
-  border-radius:6px;
-  overflow:hidden;
-  cursor:pointer;
-  transition:.15s;
-}
-.card:hover{
-  border-color:var(--cyan);
-  box-shadow:0 0 10px #00f3ff55;
-  transform:translateY(-1px);
-}
-.card.selected{
-  border-color:var(--pink);
-  box-shadow:0 0 14px #ff007f99;
-}
-.thumb{
-  height:145px;
-  background:#000;
-  position:relative;
-}
-.thumb img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-.num{
-  position:absolute;
-  right:5px;
-  top:5px;
-  background:#000d;
-  border:1px solid var(--cyan);
-  color:var(--cyan);
-  padding:3px 5px;
-  font-size:.62rem;
-}
-.info{padding:6px;font-size:.67rem}
-.name{
-  color:var(--cyan);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-.path{
-  color:#7188a5;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  margin-top:3px;
-}
+    header {
+        background: linear-gradient(180deg, #0a1128 0%, #050814 100%);
+        border-bottom: 2px solid var(--neon-blue);
+        box-shadow: var(--border-glow);
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
 
-.editor{
-  background:var(--panel);
-  border:2px solid var(--cyan);
-  border-radius:8px;
-  padding:14px;
-  height:max-content;
-  position:sticky;
-  top:10px;
-}
-.editor-title{
-  color:var(--pink);
-  padding-bottom:8px;
-  border-bottom:1px solid var(--line);
-  margin-bottom:12px;
-}
-label{
-  display:block;
-  color:var(--cyan);
-  font-size:.72rem;
-  font-weight:bold;
-  margin:8px 0 4px;
-}
-input,textarea{
-  width:100%;
-  background:#000;
-  color:#fff;
-  border:1px solid #236078;
-  border-radius:4px;
-  padding:8px;
-  font:inherit;
-}
-textarea{min-height:78px;resize:vertical}
-.upload{
-  border:1px dashed var(--cyan);
-  padding:8px;
-  text-align:center;
-  cursor:pointer;
-  font-size:.7rem;
-  margin-top:4px;
-}
-.upload:hover{background:#00f3ff11}
-.preview{
-  margin-top:12px;
-  border:1px solid var(--line);
-  background:#000;
-  padding:8px;
-}
-.preview img{
-  width:100%;
-  max-height:180px;
-  object-fit:contain;
-  display:block;
-}
-.meta{
-  font-size:.62rem;
-  line-height:1.55;
-  margin-top:8px;
-  color:#b8c7d9;
-  word-break:break-word;
-}
-.hash{color:var(--cyan)}
-.buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:12px;
-}
-button{
-  border:0;
-  border-radius:4px;
-  padding:12px 6px;
-  font:700 .72rem Orbitron,sans-serif;
-  cursor:pointer;
-}
-button:disabled{opacity:.45;cursor:not-allowed}
-#btnSet{
-  background:linear-gradient(90deg,#00f3ff,#0077ff);
-  color:#000;
-}
-#btnDownload{
-  background:linear-gradient(90deg,#ff007f,#aa0055);
-  color:#fff;
-}
-.status{
-  text-align:center;
-  color:var(--cyan);
-  font-size:.7rem;
-  min-height:18px;
-  margin-top:8px;
-}
-.config{
-  background:#070b15;
-  border:1px solid #20354c;
-  padding:9px;
-  margin-bottom:10px;
-  font-size:.65rem;
-  line-height:1.5;
-}
-.config code{color:var(--pink)}
-.config strong{color:var(--cyan)}
-.empty{
-  padding:30px;
-  color:#8ab4f8;
-  text-align:center;
-  grid-column:1/-1;
-}
-#canvas{display:none}
+    .brand h1 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.5rem;
+        color: var(--neon-blue);
+        text-shadow: 0 0 8px var(--neon-blue);
+        letter-spacing: 2px;
+    }
+
+    .brand p { font-size: 0.85rem; color: #8ab4f8; letter-spacing: 1px; }
+
+    .casio-clock-container {
+        background: #000;
+        border: 2px solid var(--neon-blue);
+        box-shadow: 0 0 15px rgba(0, 243, 255, 0.3) inset, 0 0 10px var(--neon-blue);
+        padding: 8px 16px;
+        border-radius: 4px;
+        text-align: right;
+    }
+
+    .time-display {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.6rem;
+        color: var(--neon-blue);
+        text-shadow: 0 0 10px var(--neon-blue);
+        letter-spacing: 2px;
+    }
+
+    .date-display {
+        font-size: 0.85rem;
+        color: var(--neon-white);
+        text-shadow: 0 0 8px var(--neon-white);
+        letter-spacing: 1px;
+    }
+
+    .main-layout {
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        flex: 1;
+        gap: 20px;
+        padding: 20px;
+        max-width: 1800px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    @media (max-width: 1100px) {
+        .main-layout { grid-template-columns: 1fr; }
+    }
+
+    .display-section {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .section-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.1rem;
+        color: var(--neon-blue);
+        border-left: 4px solid var(--neon-blue);
+        padding-left: 10px;
+        text-shadow: 0 0 5px var(--neon-blue);
+    }
+
+    .cartelera-multigrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 15px;
+        background: #000;
+        border: 2px solid var(--neon-blue);
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    .cartelera-multigrid::-webkit-scrollbar { width: 8px; }
+    .cartelera-multigrid::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 4px; }
+
+    .cartel-cell {
+        background: var(--panel-bg);
+        border: 1px solid var(--neon-blue);
+        border-radius: 6px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
+    }
+
+    .cartel-img-container {
+        width: 100%;
+        height: 150px;
+        background: #000;
+        position: relative;
+    }
+
+    .cartel-img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .cartel-badge {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        border: 1px solid var(--neon-blue);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        background: rgba(0,0,0,0.8);
+        color: var(--neon-blue);
+        font-size: 6px;
+        font-family: 'Orbitron', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-shadow: 0 0 5px var(--neon-blue);
+    }
+
+    .cartel-info-box {
+        padding: 10px;
+        background: rgba(5, 8, 20, 0.95);
+        border-top: 1px solid var(--neon-blue);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .c-name {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 0.85rem;
+        color: var(--neon-blue);
+        text-shadow: 0 0 4px var(--neon-blue);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .c-detail { font-size: 0.72rem; color: var(--neon-white); }
+    .c-msg {
+        font-size: 0.72rem;
+        color: var(--neon-pink);
+        text-shadow: 0 0 4px var(--neon-pink);
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .grid-estampas {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 8px;
+        max-height: 28vh;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .grid-estampas::-webkit-scrollbar { width: 6px; }
+    .grid-estampas::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 3px; }
+
+    .estampa-card {
+        background: var(--panel-bg);
+        border: 1px solid #1e293b;
+        border-radius: 6px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .estampa-card:hover { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 243, 255, 0.4); }
+    .estampa-card.selected { border-color: var(--neon-pink); box-shadow: 0 0 12px var(--neon-pink); }
+
+    .estampa-thumb { width: 100%; height: 90px; object-fit: cover; background: #000; display: block; }
+    .estampa-info { padding: 4px; font-size: 0.65rem; text-align: center; }
+    .estampa-name { color: var(--neon-blue); font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .editor-panel {
+        background: var(--panel-bg);
+        border: 2px solid var(--neon-blue);
+        box-shadow: var(--border-glow);
+        border-radius: 8px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        height: fit-content;
+    }
+
+    .editor-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.05rem;
+        color: var(--neon-pink);
+        text-shadow: 0 0 5px var(--neon-pink);
+        border-bottom: 1px solid #1e293b;
+        padding-bottom: 6px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 0.8rem; color: var(--neon-blue); letter-spacing: 1px; font-weight: bold; }
+    
+    .form-group input {
+        background: #000;
+        border: 1px solid var(--neon-blue);
+        color: var(--neon-white);
+        padding: 8px;
+        border-radius: 4px;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 0.95rem;
+    }
+
+    .upload-box {
+        border: 2px dashed var(--neon-blue);
+        padding: 8px;
+        text-align: center;
+        border-radius: 4px;
+        cursor: pointer;
+        background: rgba(0,243,255,0.05);
+        font-size: 0.75rem;
+        color: var(--neon-blue);
+    }
+    .upload-box:hover { background: rgba(0,243,255,0.15); }
+
+    .btn-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 5px;
+    }
+
+    .btn-action {
+        background: linear-gradient(90deg, #00f3ff, #0077ff);
+        color: #000;
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 700;
+        border: none;
+        padding: 12px 6px;
+        border-radius: 4px;
+        cursor: pointer;
+        text-transform: uppercase;
+        box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        transition: all 0.2s;
+        text-align: center;
+        font-size: 0.75rem;
+    }
+
+    .btn-action:hover { background: #fff; color: #000; box-shadow: 0 0 15px #fff; }
+    .btn-secondary { background: linear-gradient(90deg, #ff007f, #aa0055); color: #fff; box-shadow: 0 0 10px rgba(255, 0, 127, 0.5); }
+    .btn-secondary:hover { background: #fff; color: #000; box-shadow: 0 0 15px #fff; }
+
+    .status-msg { font-size: 0.75rem; color: #00f3ff; text-align: center; min-height: 1rem; font-weight: bold; }
 </style>
-</head>
 
+</head>
 <body>
 
 <header>
-  <div class="brand">
-    <h1>VENTANIYA · ESTANTE AVISO</h1>
-    <p>CARTELERA VISUAL · ESTAMPILLAS · SELLO ATÓMICO</p>
-  </div>
-
-  <div class="clock">
-    <div id="live-time">00:00:00.000</div>
-    <div id="live-date">00/00/0000</div>
-  </div>
+    <div class="brand">
+        <h1>VENTANIYA</h1>
+        <p>ESTANTE AVISO - CONTROL DIRECTO</p>
+    </div>
+    <div class="casio-clock-container">
+        <div id="live-time" class="time-display">00:00:00.000</div>
+        <div id="live-date" class="date-display">00.XXX.0000</div>
+    </div>
 </header>
 
-<main class="layout">
-
-<section>
-  <div class="section-title">Cartelera visual — todas las estampillas</div>
-  <div class="counter" id="counter">Cargando estampillas desde GitHub…</div>
-  <div class="wall" id="wall"></div>
-</section>
-
-<aside class="editor">
-
-  <div class="editor-title">Panel de aviso y sellado</div>
-
-  <div class="config">
-    <strong>REPOSITORIO CONECTADO</strong><br>
-    GitHub:
-    <code>ventaniyasoluciones-blip/estanteaviso</code><br>
-    Rama:
-    <code>main</code><br>
-    Ubicación:
-    <code>raíz del repositorio + subcarpetas</code><br><br>
-    El sistema busca automáticamente imágenes
-    <strong>PNG, JPG, JPEG, WEBP, GIF y AVIF</strong>.
-    No hace falta volver a subir las estampillas.
-  </div>
-
-  <label>Comercio / anunciante</label>
-  <input id="sponsorName" value="COMERCIO AUSPICIANTE">
-
-  <label>Teléfono</label>
-  <input id="sponsorPhone" value="+54 9 11 0000-0000">
-
-  <label>Dirección</label>
-  <input id="sponsorAddress" value="Av. Principal 123">
-
-  <label>Texto de publicidad</label>
-  <textarea id="sponsorMsg">Nueva publicidad — escribí tu aviso acá</textarea>
-
-  <label>Logo del comercio</label>
-  <div class="upload" id="logoButton">+ CARGAR LOGO</div>
-  <input id="logoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
-
-  <div class="preview">
-    <img id="selectedPreview" alt="Estampilla seleccionada">
-    <div class="meta">
-      <div>ESTAMPA: <span id="selectedName">—</span></div>
-      <div>ÍNDICE: <span id="selectedIndex">—</span></div>
-      <div>CAPTURA: <span id="sealTime">—</span></div>
-      <div>ID SELLO SHA-256: <span class="hash" id="sealHash">—</span></div>
+<div class="main-layout">
+    <div class="display-section">
+        <div class="section-title">Cartelera en Vivo (Estante de Avisos)</div>
+        <div class="cartelera-multigrid" id="multigridContainer"></div>
     </div>
-  </div>
 
-  <div class="buttons">
-    <button id="btnSet" disabled>1. FIJAR AVISO + SELLO</button>
-    <button id="btnDownload" disabled>2. DESCARGAR ESTAMPILLA SELLADA</button>
-  </div>
+    <div class="editor-panel">
+        <div class="editor-title">Panel de Control</div>
+        
+        <div class="form-group">
+            <label>Nombre del Comercio:</label>
+            <input type="text" id="sponsorName" value="COMERCIO AUSPICIANTE">
+        </div>
 
-  <div class="status" id="status"></div>
-</aside>
+        <div class="form-group">
+            <label>Teléfono:</label>
+            <input type="text" id="sponsorPhone" value="+54 9 11 0000-0000">
+        </div>
 
-</main>
+        <div class="form-group">
+            <label>Dirección:</label>
+            <input type="text" id="sponsorAddress" value="Av. Principal 123">
+        </div>
 
-<canvas id="canvas" width="1200" height="1200"></canvas>
+        <div class="form-group">
+            <label>Instagram / Mensaje:</label>
+            <input type="text" id="sponsorMsg" value="@tucomercio">
+        </div>
+
+        <div class="form-group">
+            <label>Agregar Imágenes:</label>
+            <div class="upload-box" onclick="document.getElementById('fileInput').click()">+ Subir desde tu PC</div>
+            <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+        </div>
+
+        <div class="section-title" style="font-size: 0.9rem;">Seleccionar Estampa:</div>
+        <div class="grid-estampas" id="gridEstampas"></div>
+
+        <div class="status-msg" id="statusMsg"></div>
+
+        <div class="btn-container">
+            <button class="btn-action" id="btnSetFixed">1. Fijar Aviso</button>
+            <button class="btn-action btn-secondary" id="btnDownload">2. Descargar</button>
+        </div>
+    </div>
+</div>
+
+<canvas id="hidden-canvas" style="display:none;"></canvas>
 
 <script>
-/* =========================================================
-   CONFIGURACIÓN REAL DE TU GITHUB
-   ========================================================= */
+    const mesesShort = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV", "DIC"];
 
-const GITHUB_OWNER = "ventaniyasoluciones-blip";
-const GITHUB_REPO  = "estanteaviso";
-const GITHUB_BRANCH = "main";
+    function updateClock() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        const ms = String(now.getMilliseconds()).padStart(3, '0');
+        document.getElementById('live-time').textContent = `${h}:${m}:${s}.${ms}`;
 
-/*
-   IMPORTANTE:
-   Las imágenes actuales están en la raíz del repositorio.
-   Por eso NO usamos /estampillas.
-
-   Además, el cargador es recursivo:
-   si mañana creás carpetas, también las encuentra.
-*/
-const GITHUB_FOLDER = "";
-
-/* =========================================================
-   ESTADO
-   ========================================================= */
-
-const state = {
-  images: [],
-  selected: 0,
-  logoData: "",
-  fixed: null
-};
-
-const $ = id => document.getElementById(id);
-
-/* =========================================================
-   RELOJ CON MILISEGUNDOS
-   ========================================================= */
-
-function nowData(){
-  const d = new Date();
-  const pad = (n,l=2) => String(n).padStart(l,"0");
-
-  return {
-    d,
-    iso: d.toISOString(),
-    display:
-      `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ` +
-      `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.` +
-      `${pad(d.getMilliseconds(),3)}`
-  };
-}
-
-function updateClock(){
-  const d = new Date();
-  $("live-time").textContent =
-    `${String(d.getHours()).padStart(2,"0")}:` +
-    `${String(d.getMinutes()).padStart(2,"0")}:` +
-    `${String(d.getSeconds()).padStart(2,"0")}.` +
-    `${String(d.getMilliseconds()).padStart(3,"0")}`;
-
-  $("live-date").textContent =
-    `${String(d.getDate()).padStart(2,"0")}/` +
-    `${String(d.getMonth()+1).padStart(2,"0")}/` +
-    `${d.getFullYear()}`;
-}
-
-setInterval(updateClock,25);
-updateClock();
-
-/* =========================================================
-   URL RAW DE GITHUB
-   ========================================================= */
-
-function rawUrl(path){
-  const clean = String(path)
-    .replace(/^\\/+/, "")
-    .replace(/\\/+/g, "/");
-
-  return "https://raw.githubusercontent.com/" +
-    encodeURIComponent(GITHUB_OWNER) + "/" +
-    encodeURIComponent(GITHUB_REPO) + "/" +
-    encodeURIComponent(GITHUB_BRANCH) + "/" +
-    clean.split("/").map(encodeURIComponent).join("/");
-}
-
-/* =========================================================
-   API DE GITHUB
-   ========================================================= */
-
-function githubContentsUrl(path=""){
-  const clean = path
-    .replace(/^\/+/,"")
-    .replace(/\/+$/,"");
-
-  const suffix = clean
-    ? "/" + clean.split("/").map(encodeURIComponent).join("/")
-    : "";
-
-  return `https://api.github.com/repos/` +
-    `${encodeURIComponent(GITHUB_OWNER)}/` +
-    `${encodeURIComponent(GITHUB_REPO)}/contents${suffix}` +
-    `?ref=${encodeURIComponent(GITHUB_BRANCH)}`;
-}
-
-async function githubGet(path=""){
-  const response = await fetch(githubContentsUrl(path),{
-    cache:"no-store",
-    headers:{
-      "Accept":"application/vnd.github+json"
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = mesesShort[now.getMonth()];
+        const year = now.getFullYear();
+        document.getElementById('live-date').textContent = `${day}.${month}.${year}`;
     }
-  });
-
-  if(!response.ok){
-    let detail = "";
-    try{
-      const data = await response.json();
-      detail = data.message ? ` ${data.message}` : "";
-    }catch(_){}
-
-    throw new Error(
-      `GitHub respondió ${response.status}.${detail}`
-    );
-  }
-
-  return response.json();
-}
-
-/* =========================================================
-   BUSCAR IMÁGENES RECURSIVAMENTE
-   ========================================================= */
-
-const IMAGE_EXTENSIONS =
-  /\.(png|jpe?g|webp|gif|avif)$/i;
-
-async function collectImages(path="", results=[]){
-  const items = await githubGet(path);
-
-  for(const item of items){
-    if(item.type === "file" && IMAGE_EXTENSIONS.test(item.name)){
-      const relativePath = item.path.replace(/^\/+/,"");
-
-      results.push({
-        name: item.name,
-        path: relativePath,
-        url: rawUrl(relativePath)
-      });
-    }
-    else if(item.type === "dir"){
-      await collectImages(item.path,results);
-    }
-  }
-
-  return results;
-}
-
-/* =========================================================
-   SHA-256
-   ========================================================= */
-
-async function sha256(text){
-  const data = new TextEncoder().encode(text);
-  const hash = await crypto.subtle.digest("SHA-256",data);
-
-  return [...new Uint8Array(hash)]
-    .map(b => b.toString(16).padStart(2,"0"))
-    .join("");
-}
-
-/* =========================================================
-   CARGAR ESTAMPILLAS
-   ========================================================= */
-
-async function loadGithubImages(){
-
-  setStatus("Conectando con GitHub y buscando tus imágenes…");
-
-  const images = await collectImages("");
-
-  images.sort((a,b) =>
-    a.path.localeCompare(
-      b.path,
-      undefined,
-      {numeric:true,sensitivity:"base"}
-    )
-  );
-
-  if(!images.length){
-    throw new Error(
-      "No encontré imágenes en el repositorio."
-    );
-  }
-
-  state.images = images.map((image,index) => ({
-    ...image,
-    index:index + 1
-  }));
-
-  $("counter").textContent =
-    `${state.images.length} estampillas encontradas en ` +
-    `ventaniyasoluciones-blip/estanteaviso.`;
-
-  renderWall();
-  selectImage(0);
-
-  $("btnSet").disabled = false;
-
-  setStatus(
-    `${state.images.length} estampillas listas para usar.`
-  );
-}
-
-/* =========================================================
-   SEGURIDAD HTML
-   ========================================================= */
-
-function escapeHtml(text){
-  return String(text).replace(
-    /[&<>"']/g,
-    character => ({
-      "&":"&amp;",
-      "<":"&lt;",
-      ">":"&gt;",
-      '"':"&quot;",
-      "'":"&#39;"
-    })[character]
-  );
-}
-
-/* =========================================================
-   MOSTRAR ESTAMPILLAS
-   ========================================================= */
-
-function renderWall(){
-  const wall = $("wall");
-  wall.innerHTML = "";
-
-  state.images.forEach((image,index) => {
-
-    const card = document.createElement("div");
-    card.className = "card";
-    card.dataset.index = index;
-
-    card.innerHTML = `
-      <div class="thumb">
-        <img
-          loading="lazy"
-          src="${image.url}"
-          alt="${escapeHtml(image.name)}"
-        >
-        <span class="num">
-          #${String(index+1).padStart(3,"0")}
-        </span>
-      </div>
-
-      <div class="info">
-        <div class="name">
-          ${escapeHtml(image.name)}
-        </div>
-        <div class="path">
-          ${escapeHtml(image.path)}
-        </div>
-      </div>
-    `;
-
-    card.addEventListener("click",() => selectImage(index));
-    wall.appendChild(card);
-  });
-}
-
-/* =========================================================
-   SELECCIONAR ESTAMPILLA
-   ========================================================= */
-
-function selectImage(index){
-
-  if(!state.images.length) return;
-
-  state.selected = index;
-
-  document.querySelectorAll(".card").forEach(
-    (card,n) => {
-      card.classList.toggle("selected",n === index);
-    }
-  );
-
-  const image = state.images[index];
-
-  $("selectedPreview").src = image.url;
-  $("selectedName").textContent = image.name;
-  $("selectedIndex").textContent =
-    `${index + 1} / ${state.images.length}`;
-
-  if(!state.fixed){
-    $("sealTime").textContent = "—";
-    $("sealHash").textContent = "—";
-  }
-
-  $("btnDownload").disabled = !state.fixed;
-}
-
-/* =========================================================
-   CARGAR LOGO
-   ========================================================= */
-
-$("logoButton").addEventListener("click",() => {
-  $("logoInput").click();
-});
-
-$("logoInput").addEventListener("change",event => {
-
-  const file = event.target.files[0];
-
-  if(!file) return;
-
-  if(!file.type.startsWith("image/")){
-    setStatus("El archivo seleccionado no es una imagen.");
-    return;
-  }
-
-  const reader = new FileReader();
-
-  reader.onload = () => {
-    state.logoData = reader.result;
-    setStatus("Logo cargado correctamente.");
-  };
-
-  reader.onerror = () => {
-    setStatus("No se pudo leer el logo.");
-  };
-
-  reader.readAsDataURL(file);
-});
-
-/* =========================================================
-   BOTÓN 1 — FIJAR AVISO + SELLO ATÓMICO
-   ========================================================= */
-
-$("btnSet").addEventListener("click",async() => {
-
-  if(!state.images.length){
-    setStatus("Primero cargá las estampillas.");
-    return;
-  }
-
-  const time = nowData();
-  const image = state.images[state.selected];
-
-  const payload = {
-    version:"VENTANIYA-ATOMIC-SEAL-2",
-
-    image:{
-      name:image.name,
-      path:image.path,
-      index:state.selected + 1,
-      total:state.images.length,
-      url:image.url
-    },
-
-    advertiser:{
-      name:$("sponsorName").value,
-      phone:$("sponsorPhone").value,
-      address:$("sponsorAddress").value,
-      message:$("sponsorMsg").value
-    },
-
-    logoPresent:!!state.logoData,
-
-    capturedAt:time.iso,
-    capturedAtMillis:time.d.getTime()
-  };
-
-  const hash = await sha256(
-    JSON.stringify(payload)
-  );
-
-  state.fixed = {
-    ...payload,
-    hash,
-    displayTime:time.display
-  };
-
-  $("sealTime").textContent = time.display;
-  $("sealHash").textContent = hash;
-
-  $("btnDownload").disabled = false;
-
-  setStatus(
-    "AVISO FIJADO · SELLO SHA-256 GENERADO."
-  );
-});
-
-/* =========================================================
-   BOTÓN 2 — DESCARGAR ESTAMPILLA SELLADA
-   ========================================================= */
-
-$("btnDownload").addEventListener("click",async() => {
-
-  if(!state.fixed){
-    setStatus(
-      "Primero presioná «1. FIJAR AVISO + SELLO»."
-    );
-    return;
-  }
-
-  setStatus("Generando PNG sellado…");
-
-  try{
-
-    const imageData = state.images[state.selected];
-    const image = await loadImage(imageData.url);
-
-    const canvas = $("canvas");
-    const ctx = canvas.getContext("2d");
-
-    const W = 1200;
-    const H = 1200;
-
-    canvas.width = W;
-    canvas.height = H;
-
-    /* Fondo */
-    ctx.fillStyle = "#050814";
-    ctx.fillRect(0,0,W,H);
-
-    /* Imagen principal */
-    const scale = Math.max(
-      W / image.width,
-      H / image.height
-    );
-
-    const dw = image.width * scale;
-    const dh = image.height * scale;
-
-    ctx.drawImage(
-      image,
-      (W-dw)/2,
-      (H-dh)/2,
-      dw,
-      dh
-    );
-
-    /* Capa oscura */
-    ctx.fillStyle = "rgba(5,8,20,.22)";
-    ctx.fillRect(0,0,W,H);
-
-    /* Marco */
-    ctx.strokeStyle = "#00f3ff";
-    ctx.lineWidth = 5;
-    ctx.strokeRect(22,22,W-44,H-44);
-
-    /* Logo */
-    if(state.logoData){
-
-      const logo = await loadImage(state.logoData);
-
-      const max = 155;
-
-      const scaleLogo = Math.min(
-        max / logo.width,
-        max / logo.height
-      );
-
-      const lw = logo.width * scaleLogo;
-      const lh = logo.height * scaleLogo;
-
-      ctx.fillStyle = "rgba(0,0,0,.72)";
-      ctx.fillRect(48,48,190,190);
-
-      ctx.drawImage(
-        logo,
-        68 + (155-lw)/2,
-        68 + (155-lh)/2,
-        lw,
-        lh
-      );
+    setInterval(updateClock, 30);
+
+    let listaImagenes = JSON.parse(localStorage.getItem('ventaniya_imagenes_db')) || [
+        { name: "aviso_ejemplo.png", data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' fill='%2300f3ff'><rect width='100%' height='100%' fill='%230b1120'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='14'>Sube tu aviso</text></svg>" }
+    ];
+
+    let selectedIndex = 0;
+    const gridSelector = document.getElementById('gridEstampas');
+    const multigridContainer = document.getElementById('multigridContainer');
+
+    if(localStorage.getItem('ventaniya_name')) document.getElementById('sponsorName').value = localStorage.getItem('ventaniya_name');
+    if(localStorage.getItem('ventaniya_phone')) document.getElementById('sponsorPhone').value = localStorage.getItem('ventaniya_phone');
+    if(localStorage.getItem('ventaniya_address')) document.getElementById('sponsorAddress').value = localStorage.getItem('ventaniya_address');
+    if(localStorage.getItem('ventaniya_msg')) document.getElementById('sponsorMsg').value = localStorage.getItem('ventaniya_msg');
+
+    let savedIndex = localStorage.getItem('ventaniya_img_index');
+    if(savedIndex !== null) selectedIndex = parseInt(savedIndex);
+
+    function inicializarSistema() {
+        gridSelector.innerHTML = '';
+        
+        listaImagenes.forEach((imgObj, idx) => {
+            const card = document.createElement('div');
+            card.className = `estampa-card ${idx === selectedIndex ? 'selected' : ''}`;
+            card.innerHTML = `
+                <img class="estampa-thumb" src="${imgObj.data}" alt="${imgObj.name}">
+                <div class="estampa-info"><div class="estampa-name">${imgObj.name}</div></div>
+            `;
+
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.estampa-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedIndex = idx;
+            });
+
+            gridSelector.appendChild(card);
+        });
+
+        renderMultigrid();
     }
 
-    /* Cartel publicitario */
-    const boxY = 770;
-    const boxH = 365;
+    function renderMultigrid() {
+        multigridContainer.innerHTML = '';
 
-    ctx.fillStyle = "rgba(5,8,20,.94)";
-    ctx.fillRect(45,boxY,W-90,boxH);
+        const sName = (localStorage.getItem('ventaniya_name') || "COMERCIO AUSPICIANTE").toUpperCase();
+        const sPhone = localStorage.getItem('ventaniya_phone') || "+54 9 11 0000-0000";
+        const sAddress = localStorage.getItem('ventaniya_address') || "Av. Principal 123";
+        const sMsg = localStorage.getItem('ventaniya_msg') || "@tucomercio";
+        let activeIdx = localStorage.getItem('ventaniya_img_index') !== null ? parseInt(localStorage.getItem('ventaniya_img_index')) : selectedIndex;
 
-    ctx.strokeStyle = "#00f3ff";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(45,boxY,W-90,boxH);
+        const totalCeldas = Math.max(20, listaImagenes.length);
 
-    /* Comercio */
-    ctx.font = "900 38px Orbitron";
-    ctx.fillStyle = "#00f3ff";
+        for (let i = 0; i < totalCeldas; i++) {
+            const imgObj = listaImagenes[i % listaImagenes.length];
+            const cell = document.createElement('div');
+            cell.className = 'cartel-cell';
 
-    ctx.fillText(
-      $("sponsorName").value.toUpperCase().slice(0,34),
-      75,
-      boxY + 58
-    );
+            const esDestacada = (i % listaImagenes.length) === activeIdx;
 
-    /* Teléfono */
-    ctx.font = "24px Share Tech Mono";
-    ctx.fillStyle = "#ffffff";
-
-    ctx.fillText(
-      $("sponsorPhone").value.slice(0,55),
-      75,
-      boxY + 100
-    );
-
-    /* Dirección */
-    ctx.fillText(
-      $("sponsorAddress").value.slice(0,55),
-      75,
-      boxY + 138
-    );
-
-    /* Publicidad */
-    ctx.fillStyle = "#ff007f";
-    ctx.font = "700 27px Share Tech Mono";
-
-    wrapText(
-      ctx,
-      $("sponsorMsg").value,
-      75,
-      boxY + 184,
-      W - 170,
-      34,
-      3
-    );
-
-    /* Sello */
-    ctx.fillStyle = "#07101c";
-    ctx.fillRect(
-      75,
-      boxY + 270,
-      W - 150,
-      70
-    );
-
-    ctx.strokeStyle = "#ff007f";
-    ctx.strokeRect(
-      75,
-      boxY + 270,
-      W - 150,
-      70
-    );
-
-    ctx.font = "700 15px Share Tech Mono";
-    ctx.fillStyle = "#ffffff";
-
-    ctx.fillText(
-      `SELLO ATÓMICO · ${state.fixed.displayTime}`,
-      90,
-      boxY + 297
-    );
-
-    ctx.fillStyle = "#00f3ff";
-    ctx.font = "12px Share Tech Mono";
-
-    ctx.fillText(
-      `SHA-256: ${state.fixed.hash}`,
-      90,
-      boxY + 320
-    );
-
-    /* Pie */
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "12px Share Tech Mono";
-
-    ctx.fillText(
-      `VENTANIYA · ESTAMPA #${String(state.selected+1).padStart(3,"0")} · ${imageData.name}`,
-      45,
-      1175
-    );
-
-    /* Descarga */
-    const link = document.createElement("a");
-
-    link.download =
-      `EstampillaSellada-` +
-      `${String(state.selected+1).padStart(3,"0")}-` +
-      `${state.fixed.hash.slice(0,12)}.png`;
-
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-
-    setStatus(
-      "DESCARGA LISTA · PNG CON AVISO + LOGO + SELLO."
-    );
-
-  }catch(error){
-
-    console.error(error);
-
-    setStatus(
-      "No pude generar la descarga. Si aparece CORS, abrí la página desde GitHub Pages."
-    );
-  }
-});
-
-/* =========================================================
-   TEXTO MULTILÍNEA
-   ========================================================= */
-
-function wrapText(
-  ctx,
-  text,
-  x,
-  y,
-  maxWidth,
-  lineHeight,
-  maxLines
-){
-
-  const words = String(text).split(/\s+/);
-  const lines = [];
-  let line = "";
-
-  for(const word of words){
-
-    const test = line
-      ? line + " " + word
-      : word;
-
-    if(
-      ctx.measureText(test).width > maxWidth &&
-      line
-    ){
-
-      lines.push(line);
-      line = word;
-
-      if(lines.length === maxLines - 1){
-        break;
-      }
-
-    }else{
-      line = test;
+            cell.innerHTML = `
+                <div class="cartel-img-container">
+                    <img src="${imgObj.data}" alt="Estampa">
+                    <div class="cartel-badge">VTN<br>${i+1}</div>
+                </div>
+                <div class="cartel-info-box">
+                    <div class="c-name">${esDestacada ? sName : `COMERCIO #${i+1}`}</div>
+                    <div class="c-detail">${esDestacada ? sPhone : 'Tel: Disponible'}</div>
+                    <div class="c-detail">${esDestacada ? sAddress : 'Zona Comercial'}</div>
+                    <div class="c-msg">${esDestacada ? sMsg : '@espacio_libre'}</div>
+                </div>
+            `;
+            multigridContainer.appendChild(cell);
+        }
     }
-  }
 
-  if(line && lines.length < maxLines){
-    lines.push(line);
-  }
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+        const files = e.target.files;
+        if (!files.length) return;
 
-  lines.forEach((lineText,index) => {
-    ctx.fillText(
-      lineText,
-      x,
-      y + index * lineHeight
-    );
-  });
-}
+        let cargados = 0;
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                listaImagenes.push({
+                    name: file.name,
+                    data: event.target.result
+                });
+                cargados++;
+                if(cargados === files.length) {
+                    localStorage.setItem('ventaniya_imagenes_db', JSON.stringify(listaImagenes));
+                    inicializarSistema();
+                    const msg = document.getElementById('statusMsg');
+                    msg.textContent = "¡Imágenes subidas!";
+                    setTimeout(() => { msg.textContent = ""; }, 2500);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    });
 
-/* =========================================================
-   CARGAR IMAGEN PARA CANVAS
-   ========================================================= */
+    // BOTÓN 1: FIJAR AVISO
+    document.getElementById('btnSetFixed').onclick = () => {
+        localStorage.setItem('ventaniya_name', document.getElementById('sponsorName').value);
+        localStorage.setItem('ventaniya_phone', document.getElementById('sponsorPhone').value);
+        localStorage.setItem('ventaniya_address', document.getElementById('sponsorAddress').value);
+        localStorage.setItem('ventaniya_msg', document.getElementById('sponsorMsg').value);
+        localStorage.setItem('ventaniya_img_index', selectedIndex);
 
-function loadImage(src){
+        renderMultigrid();
+        const msg = document.getElementById('statusMsg');
+        msg.textContent = "¡Aviso fijado en la grilla!";
+        setTimeout(() => { msg.textContent = ""; }, 2500);
+    };
 
-  return new Promise((resolve,reject) => {
+    // BOTÓN 2: DESCARGAR
+    document.getElementById('btnDownload').onclick = () => {
+        const msg = document.getElementById('statusMsg');
+        msg.textContent = "Generando descarga...";
+        
+        setTimeout(() => {
+            let activeIdx = localStorage.getItem('ventaniya_img_index') !== null ? parseInt(localStorage.getItem('ventaniya_img_index')) : selectedIndex;
+            const targetImg = listaImagenes[activeIdx] || listaImagenes[0];
 
-    const image = new Image();
+            const img = new Image();
+            img.src = targetImg.data;
+            
+            img.onload = () => {
+                const canvas = document.getElementById('hidden-canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 600;
+                canvas.height = 600;
 
-    image.crossOrigin = "anonymous";
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "rgba(5, 8, 20, 0.3)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(
-      new Error("No se pudo cargar la imagen para el sellado.")
-    );
+                const boxX = 20, boxY = canvas.height - 130, boxW = 560, boxH = 100;
+                ctx.fillStyle = "rgba(5, 8, 20, 0.95)";
+                ctx.strokeStyle = "#00f3ff";
+                ctx.lineWidth = 2;
+                ctx.fillRect(boxX, boxY, boxW, boxH);
+                ctx.strokeRect(boxX, boxY, boxW, boxH);
 
-    image.src = src;
-  });
-}
+                ctx.font = "bold 20px 'Orbitron', monospace";
+                ctx.fillStyle = "#00f3ff";
+                ctx.fillText(localStorage.getItem('ventaniya_name'), boxX + 20, boxY + 30);
 
-/* =========================================================
-   MENSAJES
-   ========================================================= */
+                ctx.font = "bold 13px 'Share Tech Mono', monospace";
+                ctx.fillStyle = "#ffffff";
+                ctx.fillText(localStorage.getItem('ventaniya_phone'), boxX + 20, boxY + 55);
+                ctx.fillText(localStorage.getItem('ventaniya_address'), boxX + 20, boxY + 75);
 
-function setStatus(message){
-  $("status").textContent = message;
-}
+                ctx.fillStyle = "#ff007f";
+                ctx.fillText(localStorage.getItem('ventaniya_msg'), boxX + 20, boxY + 95);
 
-/* =========================================================
-   ARRANQUE
-   ========================================================= */
+                const link = document.createElement('a');
+                link.download = `EstanteAviso-Estampa.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                msg.textContent = "";
+            };
+        }, 200);
+    };
 
-loadGithubImages().catch(error => {
-
-  console.error(error);
-
-  $("counter").textContent =
-    "No se pudieron cargar las estampillas.";
-
-  setStatus(
-    error.message +
-    " Verificá que el repositorio sea público."
-  );
-});
+    inicializarSistema();
 </script>
 
 </body>
