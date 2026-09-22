@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartelera VentaniYA - Avisos</title>
+    <title>Cartelera VentaniYA - Estampiyas y Avisos</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -212,7 +212,7 @@
 <header>
     <div class="brand">
         <h1>VENTANIYA</h1>
-        <p>CARTELERA DIGITAL DE AVISOS</p>
+        <p>CARTELERA DIGITAL DE ESTAMPIYAS Y AVISOS</p>
     </div>
     <div class="casio-clock-container">
         <div id="live-time" class="time-display">00:00:00.000</div>
@@ -221,7 +221,7 @@
 </header>
 
 <div class="main-container">
-    <div class="section-title">Avisos Disponibles para Redes Sociales</div>
+    <div class="section-title">Estampiyas y Avisos Disponibles para Redes</div>
     <div class="cartelera-grid" id="carteleraGrid"></div>
 </div>
 
@@ -244,28 +244,30 @@
     setInterval(updateClock, 30);
 
     // =========================================================================
-    // LISTA DE TUS IMÁGENES
-    // Coloca aquí los nombres exactos de los archivos que subas a tu carpeta 'avisos'
+    // LISTA DE TUS ESTAMPIYAS / IMÁGENES EN EL REPOSITORIO
+    // Simplemente pon aquí los nombres exactos de los archivos de imagen 
+    // que tienes subidos en tu repositorio (ej: "estampiya1.jpg", "flyer.png", etc.)
     // =========================================================================
-    const listaAvisos = [
-        "aviso1.jpg",
-        "aviso2.png",
-        "aviso3.jpg"
+    const misEstampiyas = [
+        "estampiya1.jpg",
+        "estampiya2.png",
+        "aviso1.jpg"
     ];
 
     function renderCartelera() {
         const grid = document.getElementById('carteleraGrid');
         grid.innerHTML = '';
 
-        listaAvisos.forEach((nombreArchivo) => {
-            const imageUrl = `./avisos/${nombreArchivo}`;
+        misEstampiyas.forEach((nombreArchivo) => {
+            // Busca la imagen directamente en la ruta raíz del repositorio de GitHub Pages
+            const imageUrl = `./${nombreArchivo}`;
 
             const card = document.createElement('div');
             card.className = 'cartel-card';
             card.innerHTML = `
                 <div class="cartel-content">
                     <div class="cartel-img-box">
-                        <img src="${imageUrl}" alt="${nombreArchivo}" onerror="this.parentElement.innerHTML='<div style=\'color:#ff007f;font-size:0.7rem;text-align:center;padding:10px;\'>Sube la imagen <b>${nombreArchivo}</b> a tu carpeta avisos</div>'">
+                        <img src="${imageUrl}" alt="${nombreArchivo}" onerror="this.parentElement.innerHTML='<div style=\'color:#ff007f;font-size:0.65rem;text-align:center;padding:10px;\'>Falta el archivo: <b>${nombreArchivo}</b> en el repo</div>'">
                     </div>
                     <div class="cartel-sidebar">
                         <div class="sidebar-brand">VTN AVISO</div>
