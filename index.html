@@ -3,291 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartelera VentaniYA - Estampiyas y Avisos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>Estante de Avisos - VentaniYA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --neon-blue: #00f3ff;
-            --neon-white: #ffffff;
-            --neon-pink: #ff007f;
-            --bg-dark: #050814;
-            --panel-bg: #0b1120;
-            --border-glow: 0 0 15px rgba(0, 243, 255, 0.4);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
-            background-color: var(--bg-dark);
-            color: var(--neon-white);
+            background-color: #0b0f19;
+            color: #00ffcc;
             font-family: 'Share Tech Mono', monospace;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            margin: 0;
+            padding: 20px;
         }
-
         header {
-            background: linear-gradient(180deg, #0a1128 0%, #050814 100%);
-            border-bottom: 2px solid var(--neon-blue);
-            box-shadow: var(--border-glow);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            text-align: center;
+            border-bottom: 2px solid #00ffcc;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
         }
-
-        .brand h1 {
+        h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            color: var(--neon-blue);
-            text-shadow: 0 0 8px var(--neon-blue);
+            margin: 0;
+            font-size: 1.8rem;
             letter-spacing: 2px;
         }
-
-        .brand p { font-size: 0.85rem; color: #8ab4f8; letter-spacing: 1px; }
-
-        .casio-clock-container {
-            background: #000;
-            border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3) inset, 0 0 10px var(--neon-blue);
-            padding: 8px 16px;
-            border-radius: 4px;
-            text-align: right;
-        }
-
-        .time-display {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.6rem;
-            color: var(--neon-blue);
-            text-shadow: 0 0 10px var(--neon-blue);
-            letter-spacing: 2px;
-        }
-
-        .date-display {
-            font-size: 0.85rem;
-            color: var(--neon-white);
-            text-shadow: 0 0 8px var(--neon-white);
-            letter-spacing: 1px;
-        }
-
-        .main-container {
-            max-width: 1400px;
-            width: 100%;
-            margin: 20px auto;
-            padding: 0 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .section-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            color: var(--neon-blue);
-            border-left: 4px solid var(--neon-blue);
-            padding-left: 10px;
-            text-shadow: 0 0 5px var(--neon-blue);
-            margin-bottom: 10px;
-        }
-
-        .cartelera-grid {
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-
-        .cartel-card {
-            background: var(--panel-bg);
-            border: 2px solid var(--neon-blue);
+        .card {
+            background: #131c31;
+            border: 1px solid #00ffcc;
             border-radius: 8px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 12px rgba(0, 243, 255, 0.25);
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
         }
-
-        .cartel-content {
-            display: flex;
-            flex-direction: row;
-            background: #000;
-            height: 220px;
-        }
-
-        .cartel-img-box {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #000;
-            overflow: hidden;
-        }
-
-        .cartel-img-box img {
+        .card img {
             width: 100%;
-            height: 100%;
+            height: 250px;
             object-fit: contain;
-        }
-
-        .cartel-sidebar {
-            width: 130px;
-            background: rgba(5, 8, 20, 0.95);
-            border-left: 1px solid var(--neon-blue);
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .sidebar-brand {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.7rem;
-            color: var(--neon-pink);
-            text-align: center;
-            font-weight: 900;
-            text-shadow: 0 0 4px var(--neon-pink);
-            border-bottom: 1px solid #1e293b;
-            padding-bottom: 4px;
-        }
-
-        .sidebar-info .c-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.7rem;
-            color: var(--neon-blue);
-            margin-bottom: 4px;
-            line-height: 1.1;
-        }
-
-        .sidebar-info .c-detail {
-            font-size: 0.65rem;
-            color: #ccc;
-            word-break: break-all;
-        }
-
-        .sidebar-footer {
-            font-size: 0.65rem;
-            color: var(--neon-pink);
-            font-weight: bold;
-            text-shadow: 0 0 3px var(--neon-pink);
-            text-align: center;
-        }
-
-        .card-actions {
-            padding: 12px;
-            background: #080e1a;
-            border-top: 1px solid var(--neon-blue);
-            display: flex;
-            justify-content: center;
-        }
-
-        .btn-download {
-            background: linear-gradient(90deg, #00f3ff, #0077ff);
-            color: #000;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-            border: none;
-            padding: 10px 15px;
+            background: #000;
             border-radius: 4px;
-            cursor: pointer;
-            text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
-            font-size: 0.75rem;
-            width: 100%;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
+            margin-bottom: 15px;
         }
-
-        .btn-download:hover {
+        .btn {
+            display: inline-block;
+            background: #00ffcc;
+            color: #0b0f19;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 4px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        .btn:hover {
             background: #fff;
-            color: #000;
             box-shadow: 0 0 15px #fff;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="brand">
-        <h1>VENTANIYA</h1>
-        <p>CARTELERA DIGITAL DE ESTAMPIYAS Y AVISOS</p>
+    <header>
+        <h1>VENTANIYA - ESTANTE DE AVISOS</h1>
+        <p>Estampiyas y carteles disponibles para descarga</p>
+    </header>
+
+    <div class="grid" id="estanteGrid">
+        <!-- Las imágenes se cargan dinámicamente o se listan aquí -->
     </div>
-    <div class="casio-clock-container">
-        <div id="live-time" class="time-display">00:00:00.000</div>
-        <div id="live-date" class="date-display">00.XXX.0000</div>
-    </div>
-</header>
 
-<div class="main-container">
-    <div class="section-title">Estampiyas y Avisos Disponibles para Redes</div>
-    <div class="cartelera-grid" id="carteleraGrid"></div>
-</div>
+    <script>
+        // Lista automática de respaldo o nombres comunes que sueles usar.
+        // Agregá o quitá nombres acá según lo que subas a tu repositorio.
+        const archivos = [
+            "estampiya1.jpg",
+            "estampiya2.jpg",
+            "estampiya3.jpg",
+            "aviso1.jpg",
+            "aviso2.jpg",
+            "imagen1.png",
+            "imagen2.png"
+        ];
 
-<script>
-    const mesesShort = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV", "DIC"];
+        const grid = document.getElementById('estanteGrid');
 
-    function updateClock() {
-        const now = new Date();
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        const s = String(now.getSeconds()).padStart(2, '0');
-        const ms = String(now.getMilliseconds()).padStart(3, '0');
-        document.getElementById('live-time').textContent = `${h}:${m}:${s}.${ms}`;
-
-        const day = String(now.getDate()).padStart(2, '0');
-        const month = mesesShort[now.getMonth()];
-        const year = now.getFullYear();
-        document.getElementById('live-date').textContent = `${day}.${month}.${year}`;
-    }
-    setInterval(updateClock, 30);
-
-    // =========================================================================
-    // LISTA DE TUS ESTAMPIYAS / IMÁGENES EN EL REPOSITORIO
-    // Simplemente pon aquí los nombres exactos de los archivos de imagen 
-    // que tienes subidos en tu repositorio (ej: "estampiya1.jpg", "flyer.png", etc.)
-    // =========================================================================
-    const misEstampiyas = [
-        "estampiya1.jpg",
-        "estampiya2.png",
-        "aviso1.jpg"
-    ];
-
-    function renderCartelera() {
-        const grid = document.getElementById('carteleraGrid');
-        grid.innerHTML = '';
-
-        misEstampiyas.forEach((nombreArchivo) => {
-            // Busca la imagen directamente en la ruta raíz del repositorio de GitHub Pages
-            const imageUrl = `./${nombreArchivo}`;
-
+        archivos.forEach(nombre => {
             const card = document.createElement('div');
-            card.className = 'cartel-card';
+            card.className = 'card';
             card.innerHTML = `
-                <div class="cartel-content">
-                    <div class="cartel-img-box">
-                        <img src="${imageUrl}" alt="${nombreArchivo}" onerror="this.parentElement.innerHTML='<div style=\'color:#ff007f;font-size:0.65rem;text-align:center;padding:10px;\'>Falta el archivo: <b>${nombreArchivo}</b> en el repo</div>'">
-                    </div>
-                    <div class="cartel-sidebar">
-                        <div class="sidebar-brand">VTN AVISO</div>
-                        <div class="sidebar-info">
-                            <div class="c-name">VENTANIYA</div>
-                            <div class="c-detail">+54 9 11 0000</div>
-                        </div>
-                        <div class="sidebar-footer">@ventaniya</div>
-                    </div>
-                </div>
-                <div class="card-actions">
-                    <a href="${imageUrl}" download="${nombreArchivo}" class="btn-download" target="_blank">📥 Descargar para Redes</a>
-                </div>
+                <img src="${nombre}" alt="${nombre}" onerror="this.closest('.card').style.display='none';">
+                <br>
+                <a href="${nombre}" download="${nombre}" class="btn" target="_blank">📥 Descargar</a>
             `;
+            // Solo muestra la tarjeta si la imagen realmente existe en el repositorio (el onerror oculta las que no existan)
             grid.appendChild(card);
         });
-    }
-
-    renderCartelera();
-</script>
+    </script>
 
 </body>
 </html>
