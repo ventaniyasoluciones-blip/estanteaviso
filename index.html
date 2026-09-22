@@ -102,7 +102,6 @@
             text-shadow: 0 0 5px var(--neon-blue);
         }
 
-        /* GRILLA MÚLTIPLE DE 25+ AVISOS EN PANTALLA */
         .cartelera-multigrid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -325,7 +324,7 @@
         <div class="display-section">
             <div class="section-title">Cartelera en Vivo (Estante de Avisos)</div>
             <div class="cartelera-multigrid" id="multigridContainer">
-                <div style="color: var(--neon-blue); padding: 15px;">Conectando a estanteaviso...</div>
+                <div style="color: var(--neon-blue); padding: 15px;">Cargando avisos del estante...</div>
             </div>
         </div>
 
@@ -396,56 +395,69 @@
 
         async function cargarRepositorioAutomatico() {
             try {
+                // Intentamos leer directo de la API de GitHub
                 const response = await fetch('https://api.github.com/repos/ventaniyasoluciones-blip/estanteaviso/contents');
+                if (!response.ok) throw new Error('API Rate Limit o repositorio privado');
+                
                 const files = await response.json();
                 
-                // Filtramos solo imágenes válidas y armamos la URL directa de GitHub Raw
                 listaImagenesGlobal = files
                     .filter(file => file.type === 'file' && /\.(png|jpg|jpeg)$/i.test(file.name))
                     .map(file => ({
                         name: file.name,
-                        url: `https://raw.githubusercontent.com/ventaniyasoluciones-blip/estanteaviso/main/${file.name}`
+                        url: `https://raw.githubusercontent.com/ventaniyasoluciones-blip/estanteaviso/main/${file.name}?v=` + new Date().getTime()
                     }));
 
-                gridSelector.innerHTML = '';
-                if (listaImagenesGlobal.length === 0) {
-                    gridSelector.innerHTML = '<div style="color: var(--neon-pink);">No hay imágenes PNG/JPG.</div>';
-                    multigridContainer.innerHTML = '<div style="color: var(--neon-pink);">Subí imágenes al repositorio estanteaviso.</div>';
-                    return;
-                }
-
-                let savedImage = localStorage.getItem('ventaniya_image') || listaImagenesGlobal[0].url;
-
-                listaImagenesGlobal.forEach((imgObj) => {
-                    const card = document.createElement('div');
-                    card.className = `estampa-card ${imgObj.url === savedImage ? 'selected' : ''}`;
-                    card.innerHTML = `
-                        <img class="estampa-thumb" src="${imgObj.url}" alt="${imgObj.name}" crossorigin="anonymous">
-                        <div class="estampa-info"><div class="estampa-name">${imgObj.name}</div></div>
-                    `;
-
-                    card.addEventListener('click', () => {
-                        document.querySelectorAll('.estampa-card').forEach(c => c.classList.remove('selected'));
-                        card.classList.add('selected');
-                        selectedPath = imgObj.url;
+            } catch (error) {
+                // RESPALDO DE EMERGENCIA LOCAL SI LA API FALLA:
+                // Si agregás nuevas imágenes, simplemente sumalas a este array por nombre exacto.
+                console.warn("Usando respaldo estático debido a restricciones de la API de GitHub.");
+                const nombresRespaldados = ["aviso1.png", "aviso2.png", "estampa1.png", "estampa2.png", "cartel1.jpg", "cartel2.jpg"];
+                
+                listaImagenesGlobal = [];
+                for(let nom of nombresRespaldados) {
+                    listaImagenesGlobal.push({
+                        name: nom,
+                        url: `https://raw.githubusercontent.com/ventaniyasoluciones-blip/estanteaviso/main/${nom}?v=` + new Date().getTime()
                     });
+                }
+            }
 
-                    gridSelector.appendChild(card);
+            gridSelector.innerHTML = '';
+            if (listaImagenesGlobal.length === 0) {
+                gridSelector.innerHTML = '<div style="color: var(--neon-pink);">No se detectaron imágenes.</div>';
+                multigridContainer.innerHTML = '<div style="color: var(--neon-pink);">Subí imágenes PNG o JPG al repositorio.</div>';
+                return;
+            }
 
-                    if (imgObj.url === savedImage) {
-                        selectedPath = imgObj.url;
-                    }
+            let savedImage = localStorage.getItem('ventaniya_image');
+
+            listaImagenesGlobal.forEach((imgObj) => {
+                const card = document.createElement('div');
+                card.className = `estampa-card ${imgObj.url.split('?')[0] === (savedImage ? savedImage.split('?')[0] : '') ? 'selected' : ''}`;
+                card.innerHTML = `
+                    <img class="estampa-thumb" src="${imgObj.url}" alt="${imgObj.name}" crossorigin="anonymous">
+                    <div class="estampa-info"><div class="estampa-name">${imgObj.name}</div></div>
+                `;
+
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('.estampa-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    selectedPath = imgObj.url;
                 });
 
-                if (!selectedPath && listaImagenesGlobal.length > 0) {
-                    selectedPath = listaImagenesGlobal[0].url;
+                gridSelector.appendChild(card);
+
+                if (!selectedPath && imgObj.url.split('?')[0] === (savedImage ? savedImage.split('?')[0] : '')) {
+                    selectedPath = imgObj.url;
                 }
+            });
 
-                renderMultigrid();
-
-            } catch (error) {
-                multigridContainer.innerHTML = '<div style="color: var(--neon-pink);">Error al conectar. Verificá que el repositorio sea Público.</div>';
+            if (!selectedPath && listaImagenesGlobal.length > 0) {
+                selectedPath = listaImagenesGlobal[0].url;
             }
+
+            renderMultigrid();
         }
 
         function renderMultigrid() {
@@ -455,9 +467,8 @@
             const sPhone = localStorage.getItem('ventaniya_phone') || "+54 9 11 0000-0000";
             const sAddress = localStorage.getItem('ventaniya_address') || "Av. Principal 123";
             const sMsg = localStorage.getItem('ventaniya_msg') || "@tucomercio";
-            const featuredImage = localStorage.getItem('ventaniya_image') || selectedPath;
+            const featuredImage = localStorage.getItem('ventaniya_image');
 
-            // Garantiza mínimo 25 celdas visibles en pantalla repitiendo las imágenes si hacen falta
             const totalCeldas = Math.max(25, listaImagenesGlobal.length);
 
             for (let i = 0; i < totalCeldas; i++) {
@@ -467,11 +478,12 @@
                 const cell = document.createElement('div');
                 cell.className = 'cartel-cell';
 
-                const esDestacada = (imgSource === featuredImage);
+                // Comparamos ignorando los parámetros de caché
+                const esDestacada = featuredImage && imgSource.split('?')[0] === featuredImage.split('?')[0];
 
                 cell.innerHTML = `
                     <div class="cartel-img-container">
-                        <img src="${imgSource}" alt="Estampa" crossorigin="anonymous">
+                        <img src="${imgSource}" alt="Estampa" crossorigin="anonymous" onerror="this.src='https://raw.githubusercontent.com/ventaniyasoluciones-blip/estanteaviso/main/placeholder.png';">
                         <div class="cartel-badge">VTN<br>${i+1}</div>
                     </div>
                     <div class="cartel-info-box">
@@ -495,7 +507,7 @@
 
             renderMultigrid();
             const msg = document.getElementById('statusMsg');
-            msg.textContent = "¡Aviso fijado en la grilla de la pantalla!";
+            msg.textContent = "¡Aviso fijado en la grilla correctamente!";
             setTimeout(() => { msg.textContent = ""; }, 3500);
         };
 
