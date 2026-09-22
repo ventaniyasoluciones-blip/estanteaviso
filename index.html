@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -296,7 +295,6 @@
 
     .status-msg { font-size: 0.75rem; color: #00f3ff; text-align: center; min-height: 1rem; font-weight: bold; }
 </style>
-
 </head>
 <body>
 
@@ -341,8 +339,8 @@
         </div>
 
         <div class="form-group">
-            <label>Agregar Imágenes:</label>
-            <div class="upload-box" onclick="document.getElementById('fileInput').click()">+ Subir desde tu PC</div>
+            <label>Cargar Archivos Locales:</label>
+            <div class="upload-box" onclick="document.getElementById('fileInput').click()">+ Subir desde tu PC / Repo</div>
             <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
         </div>
 
@@ -353,7 +351,7 @@
 
         <div class="btn-container">
             <button class="btn-action" id="btnSetFixed">1. Fijar Aviso</button>
-            <button class="btn-action btn-secondary" id="btnDownload">2. Descargar</button>
+            <button class="btn-action btn-secondary" id="btnDownload">2. Descargar Estampa</button>
         </div>
     </div>
 </div>
@@ -378,6 +376,7 @@
     }
     setInterval(updateClock, 30);
 
+    // Lista por defecto de imágenes (puedes agregar rutas relativas de tu repositorio de GitHub aquí, ej: "img/aviso1.png")
     let listaImagenes = JSON.parse(localStorage.getItem('ventaniya_imagenes_db')) || [
         { name: "aviso_ejemplo.png", data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' fill='%2300f3ff'><rect width='100%' height='100%' fill='%230b1120'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='14'>Sube tu aviso</text></svg>" }
     ];
@@ -468,7 +467,7 @@
                     localStorage.setItem('ventaniya_imagenes_db', JSON.stringify(listaImagenes));
                     inicializarSistema();
                     const msg = document.getElementById('statusMsg');
-                    msg.textContent = "¡Imágenes subidas!";
+                    msg.textContent = "¡Imágenes integradas al sistema!";
                     setTimeout(() => { msg.textContent = ""; }, 2500);
                 }
             };
@@ -486,14 +485,14 @@
 
         renderMultigrid();
         const msg = document.getElementById('statusMsg');
-        msg.textContent = "¡Aviso fijado en la grilla!";
+        msg.textContent = "¡Aviso fijado en la cartelera!";
         setTimeout(() => { msg.textContent = ""; }, 2500);
     };
 
-    // BOTÓN 2: DESCARGAR
+    // BOTÓN 2: DESCARGAR CON SELLO ATÓMICO Y HASH DE TIEMPO
     document.getElementById('btnDownload').onclick = () => {
         const msg = document.getElementById('statusMsg');
-        msg.textContent = "Generando descarga...";
+        msg.textContent = "Generando estampa con sello atómico...";
         
         setTimeout(() => {
             let activeIdx = localStorage.getItem('ventaniya_img_index') !== null ? parseInt(localStorage.getItem('ventaniya_img_index')) : selectedIndex;
@@ -506,24 +505,24 @@
                 const canvas = document.getElementById('hidden-canvas');
                 const ctx = canvas.getContext('2d');
                 canvas.width = 600;
-                canvas.height = 600;
+                canvas.height = 650; // Ampliado para el sello atómico
 
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "rgba(5, 8, 20, 0.3)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                const boxX = 20, boxY = canvas.height - 130, boxW = 560, boxH = 100;
+                ctx.drawImage(img, 0, 0, canvas.width, 500);
+                
+                // Fondo del recuadro de datos
+                const boxX = 20, boxY = 480, boxW = 560, boxH = 150;
                 ctx.fillStyle = "rgba(5, 8, 20, 0.95)";
                 ctx.strokeStyle = "#00f3ff";
                 ctx.lineWidth = 2;
                 ctx.fillRect(boxX, boxY, boxW, boxH);
                 ctx.strokeRect(boxX, boxY, boxW, boxH);
 
-                ctx.font = "bold 20px 'Orbitron', monospace";
+                // Información del Comercio
+                ctx.font = "bold 18px 'Orbitron', monospace";
                 ctx.fillStyle = "#00f3ff";
                 ctx.fillText(localStorage.getItem('ventaniya_name'), boxX + 20, boxY + 30);
 
-                ctx.font = "bold 13px 'Share Tech Mono', monospace";
+                ctx.font = "bold 12px 'Share Tech Mono', monospace";
                 ctx.fillStyle = "#ffffff";
                 ctx.fillText(localStorage.getItem('ventaniya_phone'), boxX + 20, boxY + 55);
                 ctx.fillText(localStorage.getItem('ventaniya_address'), boxX + 20, boxY + 75);
@@ -531,8 +530,19 @@
                 ctx.fillStyle = "#ff007f";
                 ctx.fillText(localStorage.getItem('ventaniya_msg'), boxX + 20, boxY + 95);
 
+                // Sello de tiempo atómico y Hash ID con milisegundos
+                const now = new Date();
+                const timeString = now.toISOString().replace('T', ' ').substring(0, 23) + `.${String(now.getMilliseconds()).padStart(3, '0')}`;
+                const hashId = 'VTN-HASH-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + now.getTime();
+
+                ctx.font = "10px 'Share Tech Mono', monospace";
+                ctx.fillStyle = "#00f3ff";
+                ctx.fillText(`TIMESTAMP: ${timeString} UTC`, boxX + 20, boxY + 118);
+                ctx.fillStyle = "#8ab4f8";
+                ctx.fillText(`ID SELLO: ${hashId}`, boxX + 20, boxY + 135);
+
                 const link = document.createElement('a');
-                link.download = `EstanteAviso-Estampa.png`;
+                link.download = `Estampa-VentaniYA-${now.getTime()}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 msg.textContent = "";
