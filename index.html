@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartelera VentaniYA - Avisos y Promociones</title>
+    <title>Cartelera VentaniYA - Avisos</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -107,12 +107,6 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 0 12px rgba(0, 243, 255, 0.25);
-            transition: transform 0.2s;
-        }
-
-        .cartel-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
         }
 
         .cartel-content {
@@ -227,7 +221,7 @@
 </header>
 
 <div class="main-container">
-    <div class="section-title">Avisos Disponibles para Descargar y Compartir</div>
+    <div class="section-title">Avisos Disponibles para Redes Sociales</div>
     <div class="cartelera-grid" id="carteleraGrid"></div>
 </div>
 
@@ -250,22 +244,20 @@
     setInterval(updateClock, 30);
 
     // =========================================================================
-    // LISTA DE TUS IMÁGENES EN EL REPOSITORIO
-    // Simplemente agrega aquí el nombre del archivo de imagen que subas a GitHub.
-    // Ejemplo: "aviso1.jpg", "promo2.png", etc. (Guárdalos en la misma carpeta o ruta).
+    // LISTA DE TUS IMÁGENES
+    // Coloca aquí los nombres exactos de los archivos que subas a tu carpeta 'avisos'
     // =========================================================================
-    const misImágenesEnGitHub = [
+    const listaAvisos = [
         "aviso1.jpg",
-        "aviso2.jpg",
-        "aviso3.png"
+        "aviso2.png",
+        "aviso3.jpg"
     ];
 
-    function cargarCartelera() {
+    function renderCartelera() {
         const grid = document.getElementById('carteleraGrid');
         grid.innerHTML = '';
 
-        misImágenesEnGitHub.forEach((nombreArchivo) => {
-            // URL directa y segura al archivo dentro de tu propio repositorio GitHub Pages
+        listaAvisos.forEach((nombreArchivo) => {
             const imageUrl = `./avisos/${nombreArchivo}`;
 
             const card = document.createElement('div');
@@ -273,7 +265,7 @@
             card.innerHTML = `
                 <div class="cartel-content">
                     <div class="cartel-img-box">
-                        <img src="${imageUrl}" alt="${nombreArchivo}" onerror="this.src='https://via.placeholder.com/300x200/050814/00f3ff?text=Sube+Imagen+AQUI'">
+                        <img src="${imageUrl}" alt="${nombreArchivo}" onerror="this.parentElement.innerHTML='<div style=\'color:#ff007f;font-size:0.7rem;text-align:center;padding:10px;\'>Sube la imagen <b>${nombreArchivo}</b> a tu carpeta avisos</div>'">
                     </div>
                     <div class="cartel-sidebar">
                         <div class="sidebar-brand">VTN AVISO</div>
@@ -292,7 +284,7 @@
         });
     }
 
-    cargarCartelera();
+    renderCartelera();
 </script>
 
 </body>
