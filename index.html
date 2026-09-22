@@ -398,11 +398,15 @@ updateClock();
    ========================================================= */
 
 function rawUrl(path){
+  const clean = String(path)
+    .replace(/^\\/+/, "")
+    .replace(/\\/+/g, "/");
+
   return "https://raw.githubusercontent.com/" +
     encodeURIComponent(GITHUB_OWNER) + "/" +
     encodeURIComponent(GITHUB_REPO) + "/" +
     encodeURIComponent(GITHUB_BRANCH) + "/" +
-    path.split("/").map(encodeURIComponent).join("/");
+    clean.split("/").map(encodeURIComponent).join("/");
 }
 
 /* =========================================================
@@ -494,7 +498,7 @@ async function sha256(text){
 
 async function loadGithubImages(){
 
-  setStatus("Buscando estampillas en tu repositorio…");
+  setStatus("Conectando con GitHub y buscando tus imágenes…");
 
   const images = await collectImages("");
 
