@@ -104,7 +104,7 @@
 
         .cartelera-multigrid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 15px;
             background: #000;
             border: 2px solid var(--neon-blue);
@@ -131,15 +131,19 @@
 
         .cartel-img-container {
             width: 100%;
-            height: 150px;
+            height: 180px;
             background: #000;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        /* CLAVE: object-fit: contain para que NUNCA se corte la imagen */
         .cartel-img-container img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             display: block;
         }
 
@@ -216,7 +220,7 @@
         .estampa-card:hover { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 243, 255, 0.4); }
         .estampa-card.selected { border-color: var(--neon-pink); box-shadow: 0 0 12px var(--neon-pink); }
 
-        .estampa-thumb { width: 100%; height: 90px; object-fit: cover; background: #000; display: block; }
+        .estampa-thumb { width: 100%; height: 90px; object-fit: contain; background: #000; display: block; }
         .estampa-info { padding: 4px; font-size: 0.65rem; text-align: center; }
         .estampa-name { color: var(--neon-blue); font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -301,7 +305,7 @@
 <header>
     <div class="brand">
         <h1>VENTANIYA</h1>
-        <p>ESTANTE AVISO - GITHUB PAGES SYNC</p>
+        <p>ESTANTE AVISO - DINÁMICO REAL</p>
     </div>
     <div class="casio-clock-container">
         <div id="live-time" class="time-display">00:00:00.000</div>
@@ -311,7 +315,7 @@
 
 <div class="main-layout">
     <div class="display-section">
-        <div class="section-title">Cartelera en Vivo</div>
+        <div class="section-title">Cartelera en Vivo (Imágenes Cargadas)</div>
         <div class="cartelera-multigrid" id="multigridContainer"></div>
     </div>
 
@@ -376,11 +380,11 @@
     }
     setInterval(updateClock, 30);
 
-    // Lista por defecto con respaldo seguro codificado en SVG incrustado (garantiza que NUNCA falle por error 404 en GitHub Pages)
+    // Si no hay nada cargado previamente, arranca limpio o con una imagen guía por defecto
     let defaultImages = [
         { 
-          name: "aviso_base_1.png", 
-          data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%' height='100%' fill='%23050814'/><rect x='20' y='20' width='360' height='360' fill='none' stroke='%2300f3ff' stroke-width='3'/><text x='50%' y='45%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='22' fill='%2300f3ff' font-weight='bold'>VENTANIYA</text><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='14' fill='%23ff007f'>ESTANTE AVISO</text></svg>" 
+          name: "guia_inicial.svg", 
+          data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%' height='100%' fill='%23050814'/><rect x='20' y='20' width='360' height='360' fill='none' stroke='%2300f3ff' stroke-width='3'/><text x='50%' y='45%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='20' fill='%2300f3ff' font-weight='bold'>SUBE TUS FOTOS</text><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='12' fill='%23ff007f'>AQUÍ ABAJO</text></svg>" 
         }
     ];
 
@@ -405,7 +409,7 @@
             const card = document.createElement('div');
             card.className = `estampa-card ${idx === selectedIndex ? 'selected' : ''}`;
             card.innerHTML = `
-                <img class="estampa-thumb" src="${imgObj.data}" alt="${imgObj.name}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23330000\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' font-size=\\'10\\' fill=\\'%23ff0000\\'>ERROR 404</text></svg>'">
+                <img class="estampa-thumb" src="${imgObj.data}" alt="${imgObj.name}">
                 <div class="estampa-info"><div class="estampa-name">${imgObj.name}</div></div>
             `;
 
@@ -430,32 +434,30 @@
         const sMsg = localStorage.getItem('ventaniya_msg') || "@tucomercio";
         let activeIdx = localStorage.getItem('ventaniya_img_index') !== null ? parseInt(localStorage.getItem('ventaniya_img_index')) : selectedIndex;
 
-        const totalCeldas = Math.max(16, listaImagenes.length);
-
-        for (let i = 0; i < totalCeldas; i++) {
-            const imgObj = listaImagenes[i % listaImagenes.length];
+        // Muestra estrictamente las imágenes cargadas de forma dinámica una por una
+        listaImagenes.forEach((imgObj, i) => {
             const cell = document.createElement('div');
             cell.className = 'cartel-cell';
 
-            const esDestacada = (i % listaImagenes.length) === activeIdx;
+            const esDestacada = (i === activeIdx);
 
             cell.innerHTML = `
                 <div class="cartel-img-container">
-                    <img src="${imgObj.data}" alt="Estampa" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23330000\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' font-size=\\'10\\' fill=\\'%23ff0000\\'>NO ENCONTRADA</text></svg>'">
+                    <img src="${imgObj.data}" alt="${imgObj.name}">
                     <div class="cartel-badge">VTN<br>${i+1}</div>
                 </div>
                 <div class="cartel-info-box">
-                    <div class="c-name">${esDestacada ? sName : `COMERCIO #${i+1}`}</div>
+                    <div class="c-name">${esDestacada ? sName : `AVISO #${i+1}`}</div>
                     <div class="c-detail">${esDestacada ? sPhone : 'Tel: Disponible'}</div>
                     <div class="c-detail">${esDestacada ? sAddress : 'Zona Comercial'}</div>
-                    <div class="c-msg">${esDestacada ? sMsg : '@espacio_libre'}</div>
+                    <div class="c-msg">${esDestacada ? sMsg : imgObj.name}</div>
                 </div>
             `;
             multigridContainer.appendChild(cell);
-        }
+        });
     }
 
-    // Procesamiento inmediato de archivos cargados por el usuario
+    // Carga de archivos nuevos desde PC en tiempo real sin repeticiones tontas
     document.getElementById('fileInput').addEventListener('change', (e) => {
         const files = e.target.files;
         if (!files.length) return;
@@ -464,16 +466,22 @@
         Array.from(files).forEach(file => {
             const reader = new FileReader();
             reader.onload = function(event) {
+                // Si la única imagen era la guía inicial por defecto, la reemplazamos con la primera real subida
+                if(listaImagenes.length === 1 && listaImagenes[0].name === "guia_inicial.svg") {
+                    listaImagenes = [];
+                }
+
                 listaImagenes.push({
                     name: file.name,
                     data: event.target.result
                 });
                 cargados++;
+
                 if(cargados === files.length) {
                     localStorage.setItem('ventaniya_imagenes_db', JSON.stringify(listaImagenes));
                     inicializarSistema();
                     const msg = document.getElementById('statusMsg');
-                    msg.textContent = "¡Imágenes sincronizadas correctamente!";
+                    msg.textContent = "¡Imágenes agregadas a la cartelera!";
                     setTimeout(() => { msg.textContent = ""; }, 2500);
                 }
             };
@@ -512,8 +520,20 @@
                 canvas.width = 600;
                 canvas.height = 650;
 
-                ctx.drawImage(img, 0, 0, canvas.width, 480);
+                // Fondo negro para respetar la proporción completa de la imagen sin distorsión
+                ctx.fillStyle = "#000000";
+                ctx.fillRect(0, 0, canvas.width, 480);
+
+                // Cálculo para escalar la imagen completa proporcionalmente en el área superior
+                let hRatio = canvas.width / img.width;
+                let vRatio = 480 / img.height;
+                let ratio = Math.min(hRatio, vRatio);
+                let centerShiftX = (canvas.width - img.width * ratio) / 2;
+                let centerShiftY = (480 - img.height * ratio) / 2;
+
+                ctx.drawImage(img, 0, 0, img.width, img.height, centerShiftX, centerShiftY, img.width * ratio, img.height * ratio);
                 
+                // Recuadro de diseño de marca y datos
                 const boxX = 15, boxY = 485, boxW = 570, boxH = 150;
                 ctx.fillStyle = "rgba(5, 8, 20, 0.96)";
                 ctx.strokeStyle = "#00f3ff";
