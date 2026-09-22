@@ -196,7 +196,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 8px;
-            max-height: 30vh;
+            max-height: 28vh;
             overflow-y: auto;
             padding-right: 5px;
         }
@@ -211,7 +211,6 @@
             overflow: hidden;
             cursor: pointer;
             transition: all 0.2s ease;
-            position: relative;
         }
 
         .estampa-card:hover { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 243, 255, 0.4); }
@@ -257,7 +256,7 @@
 
         .upload-box {
             border: 2px dashed var(--neon-blue);
-            padding: 10px;
+            padding: 8px;
             text-align: center;
             border-radius: 4px;
             cursor: pointer;
@@ -280,14 +279,14 @@
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
             border: none;
-            padding: 10px 6px;
+            padding: 12px 6px;
             border-radius: 4px;
             cursor: pointer;
             text-transform: uppercase;
             box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
             transition: all 0.2s;
             text-align: center;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
         }
 
         .btn-action:hover { background: #fff; color: #000; box-shadow: 0 0 15px #fff; }
@@ -302,7 +301,7 @@
     <header>
         <div class="brand">
             <h1>VENTANIYA</h1>
-            <p>ESTANTE AVISO - MULTI-GRILLA LOCAL</p>
+            <p>ESTANTE AVISO - CONTROL DIRECTO</p>
         </div>
         <div class="casio-clock-container">
             <div id="live-time" class="time-display">00:00:00.000</div>
@@ -317,7 +316,7 @@
         </div>
 
         <div class="editor-panel">
-            <div class="editor-title">Panel de Control de Avisos</div>
+            <div class="editor-title">Panel de Control</div>
             
             <div class="form-group">
                 <label>Nombre del Comercio:</label>
@@ -340,10 +339,8 @@
             </div>
 
             <div class="form-group">
-                <label>Subir Nuevas Imágenes:</label>
-                <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-                    + Cargar imágenes desde tu PC
-                </div>
+                <label>Agregar Imágenes:</label>
+                <div class="upload-box" onclick="document.getElementById('fileInput').click()">+ Subir desde tu PC</div>
                 <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
             </div>
 
@@ -353,7 +350,7 @@
             <div class="status-msg" id="statusMsg"></div>
 
             <div class="btn-container">
-                <button class="btn-action" id="btnSetFixed">1. Fijar en Grilla</button>
+                <button class="btn-action" id="btnSetFixed">1. Fijar Aviso</button>
                 <button class="btn-action btn-secondary" id="btnDownload">2. Descargar</button>
             </div>
         </div>
@@ -379,9 +376,8 @@
         }
         setInterval(updateClock, 30);
 
-        // Almacenamiento local de imágenes para evitar bloqueos CORS de GitHub
         let listaImagenes = JSON.parse(localStorage.getItem('ventaniya_imagenes_db')) || [
-            { name: "ejemplo_aviso.png", data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' fill='%2300f3ff'><rect width='100%' height='100%' fill='%230b1120'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='14'>Sube tu aviso</text></svg>" }
+            { name: "aviso_ejemplo.png", data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' fill='%2300f3ff'><rect width='100%' height='100%' fill='%230b1120'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='14'>Sube tu aviso</text></svg>" }
         ];
 
         let selectedIndex = 0;
@@ -470,14 +466,15 @@
                         localStorage.setItem('ventaniya_imagenes_db', JSON.stringify(listaImagenes));
                         inicializarSistema();
                         const msg = document.getElementById('statusMsg');
-                        msg.textContent = "¡Imágenes cargadas con éxito!";
-                        setTimeout(() => { msg.textContent = ""; }, 3000);
+                        msg.textContent = "¡Imágenes subidas!";
+                        setTimeout(() => { msg.textContent = ""; }, 2500);
                     }
                 };
                 reader.readAsDataURL(file);
             });
         });
 
+        // BOTÓN 1: FIJAR AVISO
         document.getElementById('btnSetFixed').onclick = () => {
             localStorage.setItem('ventaniya_name', document.getElementById('sponsorName').value);
             localStorage.setItem('ventaniya_phone', document.getElementById('sponsorPhone').value);
@@ -488,13 +485,14 @@
             renderMultigrid();
             const msg = document.getElementById('statusMsg');
             msg.textContent = "¡Aviso fijado en la grilla!";
-            setTimeout(() => { msg.textContent = ""; }, 3000);
+            setTimeout(() => { msg.textContent = ""; }, 2500);
         };
 
+        // BOTÓN 2: DESCARGAR
         document.getElementById('btnDownload').onclick = () => {
-            renderMultigrid();
             const msg = document.getElementById('statusMsg');
             msg.textContent = "Generando descarga...";
+            
             setTimeout(() => {
                 let activeIdx = localStorage.getItem('ventaniya_img_index') !== null ? parseInt(localStorage.getItem('ventaniya_img_index')) : selectedIndex;
                 const targetImg = listaImagenes[activeIdx] || listaImagenes[0];
