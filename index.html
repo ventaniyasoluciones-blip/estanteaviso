@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartelera VentaniYA - Múltiples Avisos en Pantalla</title>
+    <title>Cartelera VentaniYA - Estante Aviso</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -102,7 +102,6 @@
             text-shadow: 0 0 5px var(--neon-blue);
         }
 
-        /* GRILLA MULTIPLE: Mínimo 25 en pantalla (5 columnas o responsive) */
         .cartelera-multigrid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -119,7 +118,6 @@
         .cartelera-multigrid::-webkit-scrollbar { width: 8px; }
         .cartelera-multigrid::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 4px; }
 
-        /* CADA CARTEL INDIVIDUAL DENTRO DE LA GRILLA */
         .cartel-cell {
             background: var(--panel-bg);
             border: 1px solid var(--neon-blue);
@@ -316,7 +314,7 @@
     <header>
         <div class="brand">
             <h1>VENTANIYA</h1>
-            <p>CARTELERA MULTI-AVISOS EN VIVO</p>
+            <p>ESTANTE AVISO - MULTI-GRILLA EN VIVO</p>
         </div>
         <div class="casio-clock-container">
             <div id="live-time" class="time-display">00:00:00.000</div>
@@ -325,11 +323,11 @@
     </header>
 
     <div class="main-layout">
-        <!-- PANTALLA PRINCIPAL: GRILLA MULTIPLE (25 o más visibles simultáneamente) -->
+        <!-- PANTALLA PRINCIPAL: GRILLA MULTIPLE -->
         <div class="display-section">
-            <div class="section-title">Cartelera en Vivo (Múltiples Avisos Simultáneos)</div>
+            <div class="section-title">Cartelera en Vivo (Estante de Avisos)</div>
             <div class="cartelera-multigrid" id="multigridContainer">
-                <div style="color: var(--neon-blue); padding: 15px;">Cargando grilla de la cartelera...</div>
+                <div style="color: var(--neon-blue); padding: 15px;">Conectando a estanteaviso...</div>
             </div>
         </div>
 
@@ -365,12 +363,11 @@
             <!-- BOTÓN 1: Deja fijo el aviso en la grilla. BOTÓN 2: Descarga -->
             <div class="btn-container">
                 <button class="btn-action" id="btnSetFixed">1. Dejar Fijo en Grilla</button>
-                <button class="btn-action btn-secondary" id="btnDownload">2. Descargar Todo</button>
+                <button class="btn-action btn-secondary" id="btnDownload">2. Descargar Estampa</button>
             </div>
         </div>
     </div>
 
-    <!-- Canvas oculto para procesar la descarga general si se requiere -->
     <canvas id="hidden-canvas" style="display:none;"></canvas>
 
     <script>
@@ -396,7 +393,6 @@
         const gridSelector = document.getElementById('gridEstampas');
         const multigridContainer = document.getElementById('multigridContainer');
 
-        // Cargar datos guardados si existen
         if(localStorage.getItem('ventaniya_name')) document.getElementById('sponsorName').value = localStorage.getItem('ventaniya_name');
         if(localStorage.getItem('ventaniya_phone')) document.getElementById('sponsorPhone').value = localStorage.getItem('ventaniya_phone');
         if(localStorage.getItem('ventaniya_address')) document.getElementById('sponsorAddress').value = localStorage.getItem('ventaniya_address');
@@ -404,19 +400,20 @@
 
         async function cargarRepositorioAutomatico() {
             try {
-                const response = await fetch('https://api.github.com/repos/ventaniyasoluciones-blip/carteleratres/contents');
+                // RUTA ACTUALIZADA AL NUEVO REPOSITORIO 'estanteaviso'
+                const response = await fetch('https://api.github.com/repos/ventaniyasoluciones-blip/estanteaviso/contents');
                 const files = await response.json();
                 listaImagenesGlobal = files.filter(file => file.type === 'file' && /\.(png|jpg|jpeg)$/i.test(file.name));
 
                 gridSelector.innerHTML = '';
                 if (listaImagenesGlobal.length === 0) {
-                    gridSelector.innerHTML = '<div style="color: var(--neon-pink);">No hay imágenes.</div>';
+                    gridSelector.innerHTML = '<div style="color: var(--neon-pink);">No hay imágenes PNG/JPG en el repositorio.</div>';
+                    multigridContainer.innerHTML = '<div style="color: var(--neon-pink);">Subí imágenes al repositorio estanteaviso.</div>';
                     return;
                 }
 
                 let savedImage = localStorage.getItem('ventaniya_image') || listaImagenesGlobal[0].name;
 
-                // Llenar selector lateral de estampas
                 listaImagenesGlobal.forEach((file) => {
                     const card = document.createElement('div');
                     card.className = `estampa-card ${file.name === savedImage ? 'selected' : ''}`;
@@ -442,36 +439,31 @@
                     selectedPath = listaImagenesGlobal[0].name;
                 }
 
-                // Renderizar la grilla principal con todos los avisos distribuidos
                 renderMultigrid();
 
             } catch (error) {
-                multigridContainer.innerHTML = '<div style="color: var(--neon-pink);">Error al conectar con el repositorio.</div>';
+                multigridContainer.innerHTML = '<div style="color: var(--neon-pink);">Error al conectar con estanteaviso. Verificá que sea público.</div>';
             }
         }
 
         function renderMultigrid() {
             multigridContainer.innerHTML = '';
 
-            // Recuperar los datos fijos guardados
             const sName = (localStorage.getItem('ventaniya_name') || "COMERCIO AUSPICIANTE").toUpperCase();
             const sPhone = localStorage.getItem('ventaniya_phone') || "+54 9 11 0000-0000";
             const sAddress = localStorage.getItem('ventaniya_address') || "Av. Principal 123";
             const sMsg = localStorage.getItem('ventaniya_msg') || "@tucomercio";
             const featuredImage = localStorage.getItem('ventaniya_image') || selectedPath;
 
-            // Asegurarnos de mostrar al menos 25 casilleros (si hay menos imágenes en el repo, se repiten o completan)
             const totalCeldas = Math.max(25, listaImagenesGlobal.length);
 
             for (let i = 0; i < totalCeldas; i++) {
-                // Asignar imagen del repositorio en bucle si supera las 100
                 const fileObj = listaImagenesGlobal[i % listaImagenesGlobal.length];
                 const imgSource = fileObj ? fileObj.name : '';
 
                 const cell = document.createElement('div');
                 cell.className = 'cartel-cell';
 
-                // Verificamos si esta celda corresponde a la estampa destacada elegida por el usuario
                 const esDestacada = (imgSource === featuredImage);
 
                 cell.innerHTML = `
@@ -490,7 +482,6 @@
             }
         }
 
-        // BOTÓN 1: Guarda el aviso y lo fija de inmediato en la grilla múltiple de la pantalla
         document.getElementById('btnSetFixed').onclick = () => {
             if(!selectedPath) return;
             localStorage.setItem('ventaniya_name', document.getElementById('sponsorName').value);
@@ -501,17 +492,15 @@
 
             renderMultigrid();
             const msg = document.getElementById('statusMsg');
-            msg.textContent = "¡Aviso fijado en la grilla de la pantalla principal!";
+            msg.textContent = "¡Aviso fijado en el estante de la pantalla!";
             setTimeout(() => { msg.textContent = ""; }, 3500);
         };
 
-        // BOTÓN 2: Descarga la captura o aviso principal
         document.getElementById('btnDownload').onclick = () => {
             renderMultigrid();
             const msg = document.getElementById('statusMsg');
-            msg.textContent = "Preparando descarga de la cartelera...";
+            msg.textContent = "Generando descarga...";
             setTimeout(() => {
-                // Generar descarga basada en la estampa destacada con su cartel
                 const img = new Image();
                 img.crossOrigin = "anonymous";
                 img.src = localStorage.getItem('ventaniya_image') || selectedPath;
@@ -526,7 +515,6 @@
                     ctx.fillStyle = "rgba(5, 8, 20, 0.3)";
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                    // Recuadro publicitario en la descarga
                     const boxX = 20, boxY = canvas.height - 130, boxW = 560, boxH = 100;
                     ctx.fillStyle = "rgba(5, 8, 20, 0.95)";
                     ctx.strokeStyle = "#00f3ff";
@@ -547,7 +535,7 @@
                     ctx.fillText(localStorage.getItem('ventaniya_msg'), boxX + 20, boxY + 95);
 
                     const link = document.createElement('a');
-                    link.download = `Cartelera-MultiAviso.png`;
+                    link.download = `EstanteAviso-Estampa.png`;
                     link.href = canvas.toDataURL('image/png');
                     link.click();
                     msg.textContent = "";
