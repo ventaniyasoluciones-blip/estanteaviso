@@ -9,891 +9,585 @@
 
 <style>
 :root{
-    --cyan:#00f3ff;
-    --pink:#ff007f;
-    --bg:#050814;
-    --panel:#0b1120;
-    --line:#17304a;
+  --cyan:#00f3ff;
+  --pink:#ff007f;
+  --blue:#0077ff;
+  --bg:#050814;
+  --panel:#0b1120;
+  --line:#17304a;
+  --text:#fff;
+  --muted:#8ab4f8;
 }
-
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
-
+*{box-sizing:border-box;margin:0;padding:0}
 body{
-    background:var(--bg);
-    color:#fff;
-    font-family:'Share Tech Mono',monospace;
-    min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Share Tech Mono',monospace;
+  min-height:100vh;
 }
-
 header{
-    padding:14px 22px;
-    border-bottom:2px solid var(--cyan);
-    box-shadow:0 0 18px #00f3ff55;
-    display:flex;
-    justify-content:space-between;
-    gap:15px;
-    align-items:center;
-    flex-wrap:wrap;
+  padding:14px 22px;
+  border-bottom:2px solid var(--cyan);
+  box-shadow:0 0 18px #00f3ff55;
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:center;
+  flex-wrap:wrap;
 }
-
-h1,
-.section-title,
-.editor-title{
-    font-family:Orbitron,sans-serif;
+h1,.section-title,.editor-title{
+  font-family:Orbitron,sans-serif;
 }
-
 h1{
-    font-size:1.35rem;
-    color:var(--cyan);
-    text-shadow:0 0 8px var(--cyan);
+  font-size:1.35rem;
+  color:var(--cyan);
+  text-shadow:0 0 8px var(--cyan);
 }
-
-.brand p{
-    color:#8ab4f8;
-    font-size:.75rem;
-}
-
+.brand p{color:var(--muted);font-size:.75rem;margin-top:4px}
 .clock{
-    background:#000;
-    border:1px solid var(--cyan);
-    padding:7px 12px;
-    text-align:right;
+  background:#000;
+  border:1px solid var(--cyan);
+  padding:7px 12px;
+  text-align:right;
+  min-width:190px;
 }
-
-#live-time{
-    font-family:Orbitron;
-    font-size:1.35rem;
-    color:var(--cyan);
-}
-
-#live-date{
-    font-size:.72rem;
-}
+#live-time{font-family:Orbitron;font-size:1.35rem;color:var(--cyan)}
+#live-date{font-size:.72rem;margin-top:2px}
 
 .layout{
-    max-width:1900px;
-    margin:auto;
-    padding:18px;
-    display:grid;
-    grid-template-columns:minmax(0,1fr) 430px;
-    gap:18px;
+  max-width:1900px;
+  margin:auto;
+  padding:18px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 430px;
+  gap:18px;
 }
-
-@media(max-width:1100px){
-    .layout{
-        grid-template-columns:1fr;
-    }
-}
-
+@media(max-width:1100px){.layout{grid-template-columns:1fr}}
 .section-title{
-    color:var(--cyan);
-    border-left:4px solid var(--cyan);
-    padding-left:9px;
-    margin-bottom:10px;
-    font-size:1rem;
+  color:var(--cyan);
+  border-left:4px solid var(--cyan);
+  padding-left:9px;
+  margin-bottom:10px;
+  font-size:1rem;
 }
-
 .counter{
-    color:#8ab4f8;
-    font-size:.7rem;
-    margin-bottom:8px;
+  color:var(--muted);
+  font-size:.7rem;
+  margin-bottom:8px;
 }
-
 .wall{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
-    gap:10px;
-    background:#000;
-    border:2px solid var(--cyan);
-    border-radius:8px;
-    padding:12px;
-    max-height:78vh;
-    overflow:auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:10px;
+  background:#000;
+  border:2px solid var(--cyan);
+  border-radius:8px;
+  padding:12px;
+  max-height:78vh;
+  overflow:auto;
 }
-
 .card{
-    background:var(--panel);
-    border:1px solid #20354c;
-    border-radius:6px;
-    overflow:hidden;
-    cursor:pointer;
-    transition:.15s;
+  background:var(--panel);
+  border:1px solid #20354c;
+  border-radius:6px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:.15s;
 }
-
 .card:hover{
-    border-color:var(--cyan);
-    box-shadow:0 0 10px #00f3ff55;
+  border-color:var(--cyan);
+  box-shadow:0 0 10px #00f3ff55;
+  transform:translateY(-1px);
 }
-
 .card.selected{
-    border-color:var(--pink);
-    box-shadow:0 0 14px #ff007f99;
+  border-color:var(--pink);
+  box-shadow:0 0 14px #ff007f99;
 }
-
 .thumb{
-    height:145px;
-    background:#000;
-    position:relative;
+  height:145px;
+  background:#000;
+  position:relative;
 }
-
 .thumb img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
 }
-
 .num{
-    position:absolute;
-    right:5px;
-    top:5px;
-    background:#000d;
-    border:1px solid var(--cyan);
-    color:var(--cyan);
-    padding:3px 5px;
-    font-size:.62rem;
+  position:absolute;
+  right:5px;
+  top:5px;
+  background:#000d;
+  border:1px solid var(--cyan);
+  color:var(--cyan);
+  padding:3px 5px;
+  font-size:.62rem;
 }
-
-.info{
-    padding:6px;
-    font-size:.67rem;
-}
-
+.info{padding:6px;font-size:.67rem}
 .name{
-    color:var(--cyan);
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+  color:var(--cyan);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.path{
+  color:#7188a5;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  margin-top:3px;
 }
 
 .editor{
-    background:var(--panel);
-    border:2px solid var(--cyan);
-    border-radius:8px;
-    padding:14px;
-    height:max-content;
-    position:sticky;
-    top:10px;
+  background:var(--panel);
+  border:2px solid var(--cyan);
+  border-radius:8px;
+  padding:14px;
+  height:max-content;
+  position:sticky;
+  top:10px;
 }
-
 .editor-title{
-    color:var(--pink);
-    padding-bottom:8px;
-    border-bottom:1px solid var(--line);
-    margin-bottom:12px;
+  color:var(--pink);
+  padding-bottom:8px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:12px;
 }
-
 label{
-    display:block;
-    color:var(--cyan);
-    font-size:.72rem;
-    font-weight:bold;
-    margin:8px 0 4px;
+  display:block;
+  color:var(--cyan);
+  font-size:.72rem;
+  font-weight:bold;
+  margin:8px 0 4px;
 }
-
-input,
-textarea{
-    width:100%;
-    background:#000;
-    color:#fff;
-    border:1px solid #236078;
-    border-radius:4px;
-    padding:8px;
-    font:inherit;
+input,textarea{
+  width:100%;
+  background:#000;
+  color:#fff;
+  border:1px solid #236078;
+  border-radius:4px;
+  padding:8px;
+  font:inherit;
 }
-
-textarea{
-    min-height:78px;
-    resize:vertical;
-}
-
+textarea{min-height:78px;resize:vertical}
 .upload{
-    border:1px dashed var(--cyan);
-    padding:8px;
-    text-align:center;
-    cursor:pointer;
-    font-size:.7rem;
-    margin-top:4px;
+  border:1px dashed var(--cyan);
+  padding:8px;
+  text-align:center;
+  cursor:pointer;
+  font-size:.7rem;
+  margin-top:4px;
 }
-
+.upload:hover{background:#00f3ff11}
 .preview{
-    margin-top:12px;
-    border:1px solid var(--line);
-    background:#000;
-    padding:8px;
+  margin-top:12px;
+  border:1px solid var(--line);
+  background:#000;
+  padding:8px;
 }
-
 .preview img{
-    width:100%;
-    max-height:180px;
-    object-fit:contain;
-    display:block;
+  width:100%;
+  max-height:180px;
+  object-fit:contain;
+  display:block;
 }
-
 .meta{
-    font-size:.62rem;
-    line-height:1.45;
-    margin-top:8px;
-    color:#b8c7d9;
-    word-break:break-word;
+  font-size:.62rem;
+  line-height:1.55;
+  margin-top:8px;
+  color:#b8c7d9;
+  word-break:break-word;
 }
-
-.hash{
-    color:var(--cyan);
-}
-
+.hash{color:var(--cyan)}
 .buttons{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-    margin-top:12px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:12px;
 }
-
 button{
-    border:0;
-    border-radius:4px;
-    padding:12px 6px;
-    font:700 .72rem Orbitron,sans-serif;
-    cursor:pointer;
+  border:0;
+  border-radius:4px;
+  padding:12px 6px;
+  font:700 .72rem Orbitron,sans-serif;
+  cursor:pointer;
 }
-
+button:disabled{opacity:.45;cursor:not-allowed}
 #btnSet{
-    background:linear-gradient(90deg,#00f3ff,#0077ff);
-    color:#000;
+  background:linear-gradient(90deg,#00f3ff,#0077ff);
+  color:#000;
 }
-
 #btnDownload{
-    background:linear-gradient(90deg,#ff007f,#aa0055);
-    color:#fff;
+  background:linear-gradient(90deg,#ff007f,#aa0055);
+  color:#fff;
 }
-
 .status{
-    text-align:center;
-    color:var(--cyan);
-    font-size:.7rem;
-    min-height:18px;
-    margin-top:8px;
+  text-align:center;
+  color:var(--cyan);
+  font-size:.7rem;
+  min-height:18px;
+  margin-top:8px;
 }
-
 .config{
-    background:#070b15;
-    border:1px solid #20354c;
-    padding:9px;
-    margin-bottom:10px;
-    font-size:.65rem;
+  background:#070b15;
+  border:1px solid #20354c;
+  padding:9px;
+  margin-bottom:10px;
+  font-size:.65rem;
+  line-height:1.5;
 }
-
-.config code{
-    color:var(--pink);
+.config code{color:var(--pink)}
+.config strong{color:var(--cyan)}
+.empty{
+  padding:30px;
+  color:#8ab4f8;
+  text-align:center;
+  grid-column:1/-1;
 }
+#canvas{display:none}
 </style>
 </head>
 
 <body>
 
 <header>
+  <div class="brand">
+    <h1>VENTANIYA · ESTANTE AVISO</h1>
+    <p>CARTELERA VISUAL · ESTAMPILLAS · SELLO ATÓMICO</p>
+  </div>
 
-    <div class="brand">
-        <h1>VENTANIYA · ESTANTE AVISO</h1>
-        <p>CARTELERA VISUAL · 100 ESTAMPILLAS · SELLO ATÓMICO</p>
-    </div>
-
-    <div class="clock">
-        <div id="live-time">00:00:00.000</div>
-        <div id="live-date">00/00/0000</div>
-    </div>
-
+  <div class="clock">
+    <div id="live-time">00:00:00.000</div>
+    <div id="live-date">00/00/0000</div>
+  </div>
 </header>
-
 
 <main class="layout">
 
 <section>
-
-    <div class="section-title">
-        Cartelera visual — todas las estampillas
-    </div>
-
-    <div class="counter" id="counter">
-        Cargando estampillas desde GitHub…
-    </div>
-
-    <div class="wall" id="wall"></div>
-
+  <div class="section-title">Cartelera visual — todas las estampillas</div>
+  <div class="counter" id="counter">Cargando estampillas desde GitHub…</div>
+  <div class="wall" id="wall"></div>
 </section>
-
 
 <aside class="editor">
 
-    <div class="editor-title">
-        Panel de aviso y sellado
+  <div class="editor-title">Panel de aviso y sellado</div>
+
+  <div class="config">
+    <strong>REPOSITORIO CONECTADO</strong><br>
+    GitHub:
+    <code>ventaniyasoluciones-blip/estanteaviso</code><br>
+    Rama:
+    <code>main</code><br>
+    Ubicación:
+    <code>raíz del repositorio + subcarpetas</code><br><br>
+    El sistema busca automáticamente imágenes
+    <strong>PNG, JPG, JPEG, WEBP, GIF y AVIF</strong>.
+    No hace falta volver a subir las estampillas.
+  </div>
+
+  <label>Comercio / anunciante</label>
+  <input id="sponsorName" value="COMERCIO AUSPICIANTE">
+
+  <label>Teléfono</label>
+  <input id="sponsorPhone" value="+54 9 11 0000-0000">
+
+  <label>Dirección</label>
+  <input id="sponsorAddress" value="Av. Principal 123">
+
+  <label>Texto de publicidad</label>
+  <textarea id="sponsorMsg">Nueva publicidad — escribí tu aviso acá</textarea>
+
+  <label>Logo del comercio</label>
+  <div class="upload" id="logoButton">+ CARGAR LOGO</div>
+  <input id="logoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+
+  <div class="preview">
+    <img id="selectedPreview" alt="Estampilla seleccionada">
+    <div class="meta">
+      <div>ESTAMPA: <span id="selectedName">—</span></div>
+      <div>ÍNDICE: <span id="selectedIndex">—</span></div>
+      <div>CAPTURA: <span id="sealTime">—</span></div>
+      <div>ID SELLO SHA-256: <span class="hash" id="sealHash">—</span></div>
     </div>
+  </div>
 
+  <div class="buttons">
+    <button id="btnSet" disabled>1. FIJAR AVISO + SELLO</button>
+    <button id="btnDownload" disabled>2. DESCARGAR ESTAMPILLA SELLADA</button>
+  </div>
 
-    <div class="config">
-
-        <b>CONFIGURACIÓN GITHUB</b><br><br>
-
-        Cambiá estas variables dentro del código:
-
-        <br><br>
-
-        <code>GITHUB_OWNER</code><br>
-        <code>GITHUB_REPO</code><br>
-        <code>GITHUB_FOLDER</code><br>
-        <code>GITHUB_BRANCH</code>
-
-    </div>
-
-
-    <label>
-        Comercio / anunciante
-    </label>
-
-    <input
-        id="sponsorName"
-        value="COMERCIO AUSPICIANTE"
-    >
-
-
-    <label>
-        Teléfono
-    </label>
-
-    <input
-        id="sponsorPhone"
-        value="+54 9 11 0000-0000"
-    >
-
-
-    <label>
-        Dirección
-    </label>
-
-    <input
-        id="sponsorAddress"
-        value="Av. Principal 123"
-    >
-
-
-    <label>
-        Texto de publicidad
-    </label>
-
-    <textarea id="sponsorMsg">Nueva publicidad — escribí tu aviso acá</textarea>
-
-
-    <label>
-        Logo del comercio
-    </label>
-
-    <div
-        class="upload"
-        onclick="document.getElementById('logoInput').click()"
-    >
-        + CARGAR LOGO
-    </div>
-
-    <input
-        id="logoInput"
-        type="file"
-        accept="image/png,image/jpeg,image/webp"
-        hidden
-    >
-
-
-    <div class="preview">
-
-        <img
-            id="selectedPreview"
-            alt="Estampilla seleccionada"
-        >
-
-        <div class="meta">
-
-            <div>
-                ESTAMPA:
-                <span id="selectedName">—</span>
-            </div>
-
-            <div>
-                ÍNDICE:
-                <span id="selectedIndex">—</span>
-            </div>
-
-            <div>
-                CAPTURA:
-                <span id="sealTime">—</span>
-            </div>
-
-            <div>
-                ID SELLO SHA-256:
-                <span class="hash" id="sealHash">—</span>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="buttons">
-
-        <button id="btnSet">
-            1. FIJAR AVISO + SELLO
-        </button>
-
-        <button id="btnDownload">
-            2. DESCARGAR ESTAMPILLA SELLADA
-        </button>
-
-    </div>
-
-
-    <div class="status" id="status"></div>
-
+  <div class="status" id="status"></div>
 </aside>
 
 </main>
 
-
-<canvas
-    id="canvas"
-    width="1200"
-    height="1200"
-    hidden
-></canvas>
-
+<canvas id="canvas" width="1200" height="1200"></canvas>
 
 <script>
-
 /* =========================================================
-   CONFIGURACIÓN DE TU GITHUB
-   =========================================================
-
-   EJEMPLO:
-
-   https://github.com/ventaniya/estampillas
-
-   Si las imágenes están dentro de:
-
-   estampillas/
-       001.png
-       002.png
-       003.png
-       ...
-       100.png
-
-   usar:
-
-   GITHUB_OWNER  = "ventaniya"
-   GITHUB_REPO   = "estampillas"
-   GITHUB_FOLDER = "estampillas"
-   GITHUB_BRANCH = "main"
-
+   CONFIGURACIÓN REAL DE TU GITHUB
    ========================================================= */
 
+const GITHUB_OWNER = "ventaniyasoluciones-blip";
+const GITHUB_REPO  = "estanteaviso";
+const GITHUB_BRANCH = "main";
 
-const GITHUB_OWNER =
-    "TU_USUARIO";
+/*
+   IMPORTANTE:
+   Las imágenes actuales están en la raíz del repositorio.
+   Por eso NO usamos /estampillas.
 
-
-const GITHUB_REPO =
-    "TU_REPOSITORIO";
-
-
-const GITHUB_FOLDER =
-    "estampillas";
-
-
-const GITHUB_BRANCH =
-    "main";
-
+   Además, el cargador es recursivo:
+   si mañana creás carpetas, también las encuentra.
+*/
+const GITHUB_FOLDER = "";
 
 /* =========================================================
-   ESTADO DEL SISTEMA
+   ESTADO
    ========================================================= */
 
 const state = {
-
-    images: [],
-
-    selected: 0,
-
-    logoData: "",
-
-    fixed: null
-
+  images: [],
+  selected: 0,
+  logoData: "",
+  fixed: null
 };
 
-
-/* =========================================================
-   ATAJO PARA ELEMENTOS HTML
-   ========================================================= */
-
-const $ = id =>
-    document.getElementById(id);
-
+const $ = id => document.getElementById(id);
 
 /* =========================================================
    RELOJ CON MILISEGUNDOS
    ========================================================= */
 
 function nowData(){
+  const d = new Date();
+  const pad = (n,l=2) => String(n).padStart(l,"0");
 
-    const d = new Date();
-
-    const iso =
-        d.toISOString();
-
-    const pad =
-        (n,l=2) =>
-        String(n).padStart(l,"0");
-
-    return {
-
-        d,
-
-        iso,
-
-        display:
-
-            `${pad(d.getDate())}/` +
-            `${pad(d.getMonth()+1)}/` +
-            `${d.getFullYear()} ` +
-
-            `${pad(d.getHours())}:` +
-            `${pad(d.getMinutes())}:` +
-            `${pad(d.getSeconds())}.` +
-            `${pad(d.getMilliseconds(),3)}`
-
-    };
-
+  return {
+    d,
+    iso: d.toISOString(),
+    display:
+      `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ` +
+      `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.` +
+      `${pad(d.getMilliseconds(),3)}`
+  };
 }
-
 
 function updateClock(){
+  const d = new Date();
+  $("live-time").textContent =
+    `${String(d.getHours()).padStart(2,"0")}:` +
+    `${String(d.getMinutes()).padStart(2,"0")}:` +
+    `${String(d.getSeconds()).padStart(2,"0")}.` +
+    `${String(d.getMilliseconds()).padStart(3,"0")}`;
 
-    const x =
-        nowData();
-
-    const d =
-        x.d;
-
-
-    $("live-time").textContent =
-
-        `${String(d.getHours()).padStart(2,"0")}:` +
-        `${String(d.getMinutes()).padStart(2,"0")}:` +
-        `${String(d.getSeconds()).padStart(2,"0")}.` +
-        `${String(d.getMilliseconds()).padStart(3,"0")}`;
-
-
-    $("live-date").textContent =
-
-        `${String(d.getDate()).padStart(2,"0")}/` +
-        `${String(d.getMonth()+1).padStart(2,"0")}/` +
-        `${d.getFullYear()}`;
-
+  $("live-date").textContent =
+    `${String(d.getDate()).padStart(2,"0")}/` +
+    `${String(d.getMonth()+1).padStart(2,"0")}/` +
+    `${d.getFullYear()}`;
 }
 
-
-setInterval(
-    updateClock,
-    25
-);
-
+setInterval(updateClock,25);
 updateClock();
 
-
 /* =========================================================
-   URL DE LAS IMÁGENES DE GITHUB
+   URL RAW DE GITHUB
    ========================================================= */
 
-function rawUrl(name){
-
-    return (
-
-        `https://raw.githubusercontent.com/` +
-
-        `${encodeURIComponent(GITHUB_OWNER)}/` +
-
-        `${encodeURIComponent(GITHUB_REPO)}/` +
-
-        `${encodeURIComponent(GITHUB_BRANCH)}/` +
-
-        `${GITHUB_FOLDER
-            .split("/")
-            .map(encodeURIComponent)
-            .join("/")}/` +
-
-        `${name
-            .split("/")
-            .map(encodeURIComponent)
-            .join("/")}`
-
-    );
-
+function rawUrl(path){
+  return "https://raw.githubusercontent.com/" +
+    encodeURIComponent(GITHUB_OWNER) + "/" +
+    encodeURIComponent(GITHUB_REPO) + "/" +
+    encodeURIComponent(GITHUB_BRANCH) + "/" +
+    path.split("/").map(encodeURIComponent).join("/");
 }
 
+/* =========================================================
+   API DE GITHUB
+   ========================================================= */
+
+function githubContentsUrl(path=""){
+  const clean = path
+    .replace(/^\/+/,"")
+    .replace(/\/+$/,"");
+
+  const suffix = clean
+    ? "/" + clean.split("/").map(encodeURIComponent).join("/")
+    : "";
+
+  return `https://api.github.com/repos/` +
+    `${encodeURIComponent(GITHUB_OWNER)}/` +
+    `${encodeURIComponent(GITHUB_REPO)}/contents${suffix}` +
+    `?ref=${encodeURIComponent(GITHUB_BRANCH)}`;
+}
+
+async function githubGet(path=""){
+  const response = await fetch(githubContentsUrl(path),{
+    cache:"no-store",
+    headers:{
+      "Accept":"application/vnd.github+json"
+    }
+  });
+
+  if(!response.ok){
+    let detail = "";
+    try{
+      const data = await response.json();
+      detail = data.message ? ` ${data.message}` : "";
+    }catch(_){}
+
+    throw new Error(
+      `GitHub respondió ${response.status}.${detail}`
+    );
+  }
+
+  return response.json();
+}
+
+/* =========================================================
+   BUSCAR IMÁGENES RECURSIVAMENTE
+   ========================================================= */
+
+const IMAGE_EXTENSIONS =
+  /\.(png|jpe?g|webp|gif|avif)$/i;
+
+async function collectImages(path="", results=[]){
+  const items = await githubGet(path);
+
+  for(const item of items){
+    if(item.type === "file" && IMAGE_EXTENSIONS.test(item.name)){
+      const relativePath = item.path.replace(/^\/+/,"");
+
+      results.push({
+        name: item.name,
+        path: relativePath,
+        url: rawUrl(relativePath)
+      });
+    }
+    else if(item.type === "dir"){
+      await collectImages(item.path,results);
+    }
+  }
+
+  return results;
+}
 
 /* =========================================================
    SHA-256
    ========================================================= */
 
 async function sha256(text){
+  const data = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest("SHA-256",data);
 
-    const data =
-        new TextEncoder().encode(text);
-
-    const hash =
-        await crypto.subtle.digest(
-            "SHA-256",
-            data
-        );
-
-    return [
-
-        ...new Uint8Array(hash)
-
-    ]
-
-    .map(
-
-        b =>
-        b.toString(16).padStart(2,"0")
-
-    )
-
+  return [...new Uint8Array(hash)]
+    .map(b => b.toString(16).padStart(2,"0"))
     .join("");
-
 }
 
-
 /* =========================================================
-   CARGAR LAS ESTAMPILLAS DESDE GITHUB
+   CARGAR ESTAMPILLAS
    ========================================================= */
 
 async function loadGithubImages(){
 
-    const extensions =
-        /\.(png|jpe?g|webp|gif|avif)$/i;
-
-
-    const api =
-
-        `https://api.github.com/repos/` +
-
-        `${encodeURIComponent(GITHUB_OWNER)}/` +
-
-        `${encodeURIComponent(GITHUB_REPO)}/contents/` +
-
-        `${GITHUB_FOLDER
-            .split("/")
-            .map(encodeURIComponent)
-            .join("/")}` +
-
-        `?ref=${encodeURIComponent(GITHUB_BRANCH)}`;
-
-
-    const response =
-        await fetch(
-            api,
-            {
-                cache:"no-store"
-            }
-        );
-
-
-    if(!response.ok){
-
-        throw new Error(
-
-            `GitHub API respondió ${response.status}.`
-
-        );
-
-    }
-
-
-    const files =
-        await response.json();
-
-
-    const names =
-
-        files
-
-        .filter(
-
-            file =>
-
-            file.type === "file" &&
-
-            extensions.test(file.name)
-
-        )
-
-        .map(
-
-            file =>
-            file.name
-
-        )
-
-        .sort(
-
-            (a,b) =>
-
-            a.localeCompare(
-                b,
-                undefined,
-                {
-                    numeric:true
-                }
-            )
-
-        );
-
-
-    if(!names.length){
-
-        throw new Error(
-
-            "No encontré imágenes en la carpeta de GitHub."
-
-        );
-
-    }
-
-
-    state.images =
-
-        names.map(
-
-            (name,index) => ({
-
-                name,
-
-                url:rawUrl(name),
-
-                index:index + 1
-
-            })
-
-        );
-
-
-    $("counter").textContent =
-
-        `${state.images.length} estampillas encontradas en GitHub.`;
-
-
-    renderWall();
-
-    selectImage(0);
-
-}
-
-
-/* =========================================================
-   MOSTRAR LAS ESTAMPILLAS
-   ========================================================= */
-
-function renderWall(){
-
-    const wall =
-        $("wall");
-
-    wall.innerHTML = "";
-
-
-    state.images.forEach(
-
-        (image,index) => {
-
-            const card =
-                document.createElement("div");
-
-
-            card.className =
-                "card";
-
-
-            card.dataset.index =
-                index;
-
-
-            card.innerHTML = `
-
-                <div class="thumb">
-
-                    <img
-                        loading="lazy"
-                        src="${image.url}"
-                        alt="${escapeHtml(image.name)}"
-                    >
-
-                    <span class="num">
-                        #${String(index+1).padStart(3,"0")}
-                    </span>
-
-                </div>
-
-                <div class="info">
-
-                    <div class="name">
-                        ${escapeHtml(image.name)}
-                    </div>
-
-                </div>
-
-            `;
-
-
-            card.onclick = () =>
-
-                selectImage(index);
-
-
-            wall.appendChild(card);
-
-        }
-
+  setStatus("Buscando estampillas en tu repositorio…");
+
+  const images = await collectImages("");
+
+  images.sort((a,b) =>
+    a.path.localeCompare(
+      b.path,
+      undefined,
+      {numeric:true,sensitivity:"base"}
+    )
+  );
+
+  if(!images.length){
+    throw new Error(
+      "No encontré imágenes en el repositorio."
     );
+  }
 
+  state.images = images.map((image,index) => ({
+    ...image,
+    index:index + 1
+  }));
+
+  $("counter").textContent =
+    `${state.images.length} estampillas encontradas en ` +
+    `ventaniyasoluciones-blip/estanteaviso.`;
+
+  renderWall();
+  selectImage(0);
+
+  $("btnSet").disabled = false;
+
+  setStatus(
+    `${state.images.length} estampillas listas para usar.`
+  );
 }
-
 
 /* =========================================================
    SEGURIDAD HTML
    ========================================================= */
 
 function escapeHtml(text){
-
-    return String(text)
-
-        .replace(
-
-            /[&<>"']/g,
-
-            character => ({
-
-                "&":"&amp;",
-                "<":"&lt;",
-                ">":"&gt;",
-                '"':"&quot;",
-                "'":"&#39;"
-
-            })[character]
-
-        );
-
+  return String(text).replace(
+    /[&<>"']/g,
+    character => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    })[character]
+  );
 }
 
+/* =========================================================
+   MOSTRAR ESTAMPILLAS
+   ========================================================= */
+
+function renderWall(){
+  const wall = $("wall");
+  wall.innerHTML = "";
+
+  state.images.forEach((image,index) => {
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.index = index;
+
+    card.innerHTML = `
+      <div class="thumb">
+        <img
+          loading="lazy"
+          src="${image.url}"
+          alt="${escapeHtml(image.name)}"
+        >
+        <span class="num">
+          #${String(index+1).padStart(3,"0")}
+        </span>
+      </div>
+
+      <div class="info">
+        <div class="name">
+          ${escapeHtml(image.name)}
+        </div>
+        <div class="path">
+          ${escapeHtml(image.path)}
+        </div>
+      </div>
+    `;
+
+    card.addEventListener("click",() => selectImage(index));
+    wall.appendChild(card);
+  });
+}
 
 /* =========================================================
    SELECCIONAR ESTAMPILLA
@@ -901,859 +595,429 @@ function escapeHtml(text){
 
 function selectImage(index){
 
-    if(!state.images.length)
-        return;
+  if(!state.images.length) return;
 
+  state.selected = index;
 
-    state.selected =
-        index;
-
-
-    document
-
-        .querySelectorAll(".card")
-
-        .forEach(
-
-            (card,n) =>
-
-                card.classList.toggle(
-
-                    "selected",
-
-                    n === index
-
-                )
-
-        );
-
-
-    const image =
-        state.images[index];
-
-
-    $("selectedPreview").src =
-        image.url;
-
-
-    $("selectedName").textContent =
-        image.name;
-
-
-    $("selectedIndex").textContent =
-
-        `${index + 1} / ${state.images.length}`;
-
-
-    if(!state.fixed){
-
-        $("sealTime").textContent =
-            "—";
-
-        $("sealHash").textContent =
-            "—";
-
+  document.querySelectorAll(".card").forEach(
+    (card,n) => {
+      card.classList.toggle("selected",n === index);
     }
+  );
 
+  const image = state.images[index];
+
+  $("selectedPreview").src = image.url;
+  $("selectedName").textContent = image.name;
+  $("selectedIndex").textContent =
+    `${index + 1} / ${state.images.length}`;
+
+  if(!state.fixed){
+    $("sealTime").textContent = "—";
+    $("sealHash").textContent = "—";
+  }
+
+  $("btnDownload").disabled = !state.fixed;
 }
-
 
 /* =========================================================
    CARGAR LOGO
    ========================================================= */
 
-$("logoInput").onchange = event => {
+$("logoButton").addEventListener("click",() => {
+  $("logoInput").click();
+});
 
-    const file =
-        event.target.files[0];
+$("logoInput").addEventListener("change",event => {
 
+  const file = event.target.files[0];
 
-    if(!file)
-        return;
+  if(!file) return;
 
+  if(!file.type.startsWith("image/")){
+    setStatus("El archivo seleccionado no es una imagen.");
+    return;
+  }
 
-    const reader =
-        new FileReader();
+  const reader = new FileReader();
 
+  reader.onload = () => {
+    state.logoData = reader.result;
+    setStatus("Logo cargado correctamente.");
+  };
 
-    reader.onload = () => {
+  reader.onerror = () => {
+    setStatus("No se pudo leer el logo.");
+  };
 
-        state.logoData =
-            reader.result;
-
-    };
-
-
-    reader.readAsDataURL(file);
-
-};
-
+  reader.readAsDataURL(file);
+});
 
 /* =========================================================
-   BOTÓN 1
-   FIJAR AVISO + SELLO ATÓMICO
+   BOTÓN 1 — FIJAR AVISO + SELLO ATÓMICO
    ========================================================= */
 
-$("btnSet").onclick = async () => {
+$("btnSet").addEventListener("click",async() => {
 
-    if(!state.images.length){
+  if(!state.images.length){
+    setStatus("Primero cargá las estampillas.");
+    return;
+  }
 
-        setStatus(
-            "Primero cargá las estampillas de GitHub."
-        );
+  const time = nowData();
+  const image = state.images[state.selected];
 
-        return;
+  const payload = {
+    version:"VENTANIYA-ATOMIC-SEAL-2",
 
-    }
+    image:{
+      name:image.name,
+      path:image.path,
+      index:state.selected + 1,
+      total:state.images.length,
+      url:image.url
+    },
 
+    advertiser:{
+      name:$("sponsorName").value,
+      phone:$("sponsorPhone").value,
+      address:$("sponsorAddress").value,
+      message:$("sponsorMsg").value
+    },
 
-    const time =
-        nowData();
+    logoPresent:!!state.logoData,
 
+    capturedAt:time.iso,
+    capturedAtMillis:time.d.getTime()
+  };
 
-    const image =
-        state.images[state.selected];
+  const hash = await sha256(
+    JSON.stringify(payload)
+  );
 
+  state.fixed = {
+    ...payload,
+    hash,
+    displayTime:time.display
+  };
 
-    const payload = {
+  $("sealTime").textContent = time.display;
+  $("sealHash").textContent = hash;
 
-        version:
-            "VENTANIYA-ATOMIC-SEAL-1",
+  $("btnDownload").disabled = false;
 
-
-        image: {
-
-            name:
-                image.name,
-
-            index:
-                state.selected + 1,
-
-            total:
-                state.images.length,
-
-            url:
-                image.url
-
-        },
-
-
-        advertiser: {
-
-            name:
-                $("sponsorName").value,
-
-            phone:
-                $("sponsorPhone").value,
-
-            address:
-                $("sponsorAddress").value,
-
-            message:
-                $("sponsorMsg").value
-
-        },
-
-
-        logoPresent:
-            !!state.logoData,
-
-
-        capturedAt:
-            time.iso,
-
-
-        capturedAtMillis:
-            time.d.getTime()
-
-    };
-
-
-    const hash =
-        await sha256(
-
-            JSON.stringify(payload)
-
-        );
-
-
-    state.fixed = {
-
-        ...payload,
-
-        hash,
-
-        displayTime:
-            time.display
-
-    };
-
-
-    $("sealTime").textContent =
-        time.display;
-
-
-    $("sealHash").textContent =
-        hash;
-
-
-    setStatus(
-
-        "AVISO FIJADO · SELLO SHA-256 GENERADO."
-
-    );
-
-};
-
+  setStatus(
+    "AVISO FIJADO · SELLO SHA-256 GENERADO."
+  );
+});
 
 /* =========================================================
-   BOTÓN 2
-   DESCARGAR ESTAMPILLA SELLADA
+   BOTÓN 2 — DESCARGAR ESTAMPILLA SELLADA
    ========================================================= */
 
-$("btnDownload").onclick = async () => {
+$("btnDownload").addEventListener("click",async() => {
 
-    if(!state.fixed){
-
-        setStatus(
-
-            "Primero presioná «1. FIJAR AVISO + SELLO»."
-
-        );
-
-        return;
-
-    }
-
-
+  if(!state.fixed){
     setStatus(
-        "Generando PNG sellado…"
+      "Primero presioná «1. FIJAR AVISO + SELLO»."
+    );
+    return;
+  }
+
+  setStatus("Generando PNG sellado…");
+
+  try{
+
+    const imageData = state.images[state.selected];
+    const image = await loadImage(imageData.url);
+
+    const canvas = $("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const W = 1200;
+    const H = 1200;
+
+    canvas.width = W;
+    canvas.height = H;
+
+    /* Fondo */
+    ctx.fillStyle = "#050814";
+    ctx.fillRect(0,0,W,H);
+
+    /* Imagen principal */
+    const scale = Math.max(
+      W / image.width,
+      H / image.height
     );
 
-
-    try{
-
-        const imageData =
-            state.images[state.selected];
-
-
-        const image =
-            await loadImage(
-                imageData.url
-            );
-
-
-        const canvas =
-            $("canvas");
-
-
-        const ctx =
-            canvas.getContext("2d");
-
-
-        const W = 1200;
-
-        const H = 1200;
-
-
-        canvas.width =
-            W;
-
-        canvas.height =
-            H;
-
-
-        /* FONDO */
-
-        ctx.fillStyle =
-            "#050814";
-
-        ctx.fillRect(
-            0,
-            0,
-            W,
-            H
-        );
-
-
-        /* IMAGEN */
-
-        const scale =
-
-            Math.max(
-
-                W / image.width,
-
-                H / image.height
-
-            );
-
-
-        const dw =
-            image.width * scale;
-
-
-        const dh =
-            image.height * scale;
-
-
-        ctx.drawImage(
-
-            image,
-
-            (W-dw)/2,
-
-            (H-dh)/2,
-
-            dw,
-
-            dh
-
-        );
-
-
-        /* CAPA */
-
-        ctx.fillStyle =
-            "rgba(5,8,20,.22)";
-
-        ctx.fillRect(
-            0,
-            0,
-            W,
-            H
-        );
-
-
-        /* MARCO */
-
-        ctx.strokeStyle =
-            "#00f3ff";
-
-        ctx.lineWidth =
-            5;
-
-        ctx.strokeRect(
-            22,
-            22,
-            W-44,
-            H-44
-        );
-
-
-        /* LOGO */
-
-        if(state.logoData){
-
-            const logo =
-                await loadImage(
-                    state.logoData
-                );
-
-
-            const max =
-                155;
-
-
-            const scaleLogo =
-
-                Math.min(
-
-                    max / logo.width,
-
-                    max / logo.height
-
-                );
-
-
-            const lw =
-                logo.width * scaleLogo;
-
-
-            const lh =
-                logo.height * scaleLogo;
-
-
-            ctx.fillStyle =
-                "rgba(0,0,0,.72)";
-
-
-            ctx.fillRect(
-                48,
-                48,
-                190,
-                190
-            );
-
-
-            ctx.drawImage(
-
-                logo,
-
-                68 + (155-lw)/2,
-
-                68 + (155-lh)/2,
-
-                lw,
-
-                lh
-
-            );
-
-        }
-
-
-        /* CARTEL DE PUBLICIDAD */
-
-        const boxY =
-            770;
-
-        const boxH =
-            365;
-
-
-        ctx.fillStyle =
-            "rgba(5,8,20,.94)";
-
-
-        ctx.fillRect(
-
-            45,
-            boxY,
-            W-90,
-            boxH
-
-        );
-
-
-        ctx.strokeStyle =
-            "#00f3ff";
-
-
-        ctx.lineWidth =
-            3;
-
-
-        ctx.strokeRect(
-
-            45,
-            boxY,
-            W-90,
-            boxH
-
-        );
-
-
-        /* COMERCIO */
-
-        ctx.font =
-            "900 38px Orbitron";
-
-
-        ctx.fillStyle =
-            "#00f3ff";
-
-
-        ctx.fillText(
-
-            $("sponsorName")
-                .value
-                .toUpperCase()
-                .slice(0,34),
-
-            75,
-
-            boxY + 58
-
-        );
-
-
-        /* TELÉFONO */
-
-        ctx.font =
-            "24px Share Tech Mono";
-
-
-        ctx.fillStyle =
-            "#ffffff";
-
-
-        ctx.fillText(
-
-            $("sponsorPhone")
-                .value
-                .slice(0,55),
-
-            75,
-
-            boxY + 100
-
-        );
-
-
-        /* DIRECCIÓN */
-
-        ctx.fillText(
-
-            $("sponsorAddress")
-                .value
-                .slice(0,55),
-
-            75,
-
-            boxY + 138
-
-        );
-
-
-        /* PUBLICIDAD */
-
-        ctx.fillStyle =
-            "#ff007f";
-
-
-        ctx.font =
-            "700 27px Share Tech Mono";
-
-
-        wrapText(
-
-            ctx,
-
-            $("sponsorMsg").value,
-
-            75,
-
-            boxY + 184,
-
-            W - 170,
-
-            34,
-
-            3
-
-        );
-
-
-        /* SELLO */
-
-        ctx.fillStyle =
-            "#07101c";
-
-
-        ctx.fillRect(
-
-            75,
-
-            boxY + 270,
-
-            W - 150,
-
-            70
-
-        );
-
-
-        ctx.strokeStyle =
-            "#ff007f";
-
-
-        ctx.strokeRect(
-
-            75,
-
-            boxY + 270,
-
-            W - 150,
-
-            70
-
-        );
-
-
-        ctx.font =
-            "700 15px Share Tech Mono";
-
-
-        ctx.fillStyle =
-            "#ffffff";
-
-
-        ctx.fillText(
-
-            `SELLO ATÓMICO · ${state.fixed.displayTime}`,
-
-            90,
-
-            boxY + 297
-
-        );
-
-
-        ctx.fillStyle =
-            "#00f3ff";
-
-
-        ctx.font =
-            "12px Share Tech Mono";
-
-
-        ctx.fillText(
-
-            `SHA-256: ${state.fixed.hash}`,
-
-            90,
-
-            boxY + 320
-
-        );
-
-
-        /* PIE */
-
-        ctx.fillStyle =
-            "#ffffff";
-
-
-        ctx.font =
-            "12px Share Tech Mono";
-
-
-        ctx.fillText(
-
-            `VENTANIYA · ESTAMPA #${String(state.selected+1).padStart(3,"0")} · ${imageData.name}`,
-
-            45,
-
-            1175
-
-        );
-
-
-        /* DESCARGA */
-
-        const link =
-            document.createElement("a");
-
-
-        link.download =
-
-            `EstampillaSellada-` +
-
-            `${String(state.selected+1).padStart(3,"0")}-` +
-
-            `${state.fixed.hash.slice(0,12)}.png`;
-
-
-        link.href =
-            canvas.toDataURL("image/png");
-
-
-        link.click();
-
-
-        setStatus(
-
-            "DESCARGA LISTA · PNG CON AVISO + LOGO + SELLO."
-
-        );
-
+    const dw = image.width * scale;
+    const dh = image.height * scale;
+
+    ctx.drawImage(
+      image,
+      (W-dw)/2,
+      (H-dh)/2,
+      dw,
+      dh
+    );
+
+    /* Capa oscura */
+    ctx.fillStyle = "rgba(5,8,20,.22)";
+    ctx.fillRect(0,0,W,H);
+
+    /* Marco */
+    ctx.strokeStyle = "#00f3ff";
+    ctx.lineWidth = 5;
+    ctx.strokeRect(22,22,W-44,H-44);
+
+    /* Logo */
+    if(state.logoData){
+
+      const logo = await loadImage(state.logoData);
+
+      const max = 155;
+
+      const scaleLogo = Math.min(
+        max / logo.width,
+        max / logo.height
+      );
+
+      const lw = logo.width * scaleLogo;
+      const lh = logo.height * scaleLogo;
+
+      ctx.fillStyle = "rgba(0,0,0,.72)";
+      ctx.fillRect(48,48,190,190);
+
+      ctx.drawImage(
+        logo,
+        68 + (155-lw)/2,
+        68 + (155-lh)/2,
+        lw,
+        lh
+      );
     }
 
-    catch(error){
+    /* Cartel publicitario */
+    const boxY = 770;
+    const boxH = 365;
 
-        console.error(error);
+    ctx.fillStyle = "rgba(5,8,20,.94)";
+    ctx.fillRect(45,boxY,W-90,boxH);
 
+    ctx.strokeStyle = "#00f3ff";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(45,boxY,W-90,boxH);
 
-        setStatus(
+    /* Comercio */
+    ctx.font = "900 38px Orbitron";
+    ctx.fillStyle = "#00f3ff";
 
-            "No pude generar la descarga. Verificá GitHub/CORS."
+    ctx.fillText(
+      $("sponsorName").value.toUpperCase().slice(0,34),
+      75,
+      boxY + 58
+    );
 
-        );
+    /* Teléfono */
+    ctx.font = "24px Share Tech Mono";
+    ctx.fillStyle = "#ffffff";
 
-    }
+    ctx.fillText(
+      $("sponsorPhone").value.slice(0,55),
+      75,
+      boxY + 100
+    );
 
-};
+    /* Dirección */
+    ctx.fillText(
+      $("sponsorAddress").value.slice(0,55),
+      75,
+      boxY + 138
+    );
 
+    /* Publicidad */
+    ctx.fillStyle = "#ff007f";
+    ctx.font = "700 27px Share Tech Mono";
+
+    wrapText(
+      ctx,
+      $("sponsorMsg").value,
+      75,
+      boxY + 184,
+      W - 170,
+      34,
+      3
+    );
+
+    /* Sello */
+    ctx.fillStyle = "#07101c";
+    ctx.fillRect(
+      75,
+      boxY + 270,
+      W - 150,
+      70
+    );
+
+    ctx.strokeStyle = "#ff007f";
+    ctx.strokeRect(
+      75,
+      boxY + 270,
+      W - 150,
+      70
+    );
+
+    ctx.font = "700 15px Share Tech Mono";
+    ctx.fillStyle = "#ffffff";
+
+    ctx.fillText(
+      `SELLO ATÓMICO · ${state.fixed.displayTime}`,
+      90,
+      boxY + 297
+    );
+
+    ctx.fillStyle = "#00f3ff";
+    ctx.font = "12px Share Tech Mono";
+
+    ctx.fillText(
+      `SHA-256: ${state.fixed.hash}`,
+      90,
+      boxY + 320
+    );
+
+    /* Pie */
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "12px Share Tech Mono";
+
+    ctx.fillText(
+      `VENTANIYA · ESTAMPA #${String(state.selected+1).padStart(3,"0")} · ${imageData.name}`,
+      45,
+      1175
+    );
+
+    /* Descarga */
+    const link = document.createElement("a");
+
+    link.download =
+      `EstampillaSellada-` +
+      `${String(state.selected+1).padStart(3,"0")}-` +
+      `${state.fixed.hash.slice(0,12)}.png`;
+
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+
+    setStatus(
+      "DESCARGA LISTA · PNG CON AVISO + LOGO + SELLO."
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    setStatus(
+      "No pude generar la descarga. Si aparece CORS, abrí la página desde GitHub Pages."
+    );
+  }
+});
 
 /* =========================================================
    TEXTO MULTILÍNEA
    ========================================================= */
 
 function wrapText(
-
-    ctx,
-    text,
-    x,
-    y,
-    maxWidth,
-    lineHeight,
-    maxLines
-
+  ctx,
+  text,
+  x,
+  y,
+  maxWidth,
+  lineHeight,
+  maxLines
 ){
 
-    const words =
-        String(text).split(/\s+/);
+  const words = String(text).split(/\s+/);
+  const lines = [];
+  let line = "";
 
+  for(const word of words){
 
-    const lines = [];
-
-    let line = "";
-
-
-    for(const word of words){
-
-        const test =
-            line
-                ? line + " " + word
-                : word;
-
-
-        if(
-
-            ctx.measureText(test).width >
-            maxWidth
-
-            && line
-
-        ){
-
-            lines.push(line);
-
-            line =
-                word;
-
-
-            if(
-                lines.length === maxLines - 1
-            ){
-
-                break;
-
-            }
-
-        }
-
-        else{
-
-            line =
-                test;
-
-        }
-
-    }
-
+    const test = line
+      ? line + " " + word
+      : word;
 
     if(
-
-        line &&
-        lines.length < maxLines
-
+      ctx.measureText(test).width > maxWidth &&
+      line
     ){
 
-        lines.push(line);
+      lines.push(line);
+      line = word;
 
+      if(lines.length === maxLines - 1){
+        break;
+      }
+
+    }else{
+      line = test;
     }
+  }
 
+  if(line && lines.length < maxLines){
+    lines.push(line);
+  }
 
-    lines.forEach(
-
-        (lineText,index) => {
-
-            ctx.fillText(
-
-                lineText,
-
-                x,
-
-                y + index * lineHeight
-
-            );
-
-        }
-
+  lines.forEach((lineText,index) => {
+    ctx.fillText(
+      lineText,
+      x,
+      y + index * lineHeight
     );
-
+  });
 }
 
-
 /* =========================================================
-   CARGAR IMAGEN
+   CARGAR IMAGEN PARA CANVAS
    ========================================================= */
 
 function loadImage(src){
 
-    return new Promise(
+  return new Promise((resolve,reject) => {
 
-        (resolve,reject) => {
+    const image = new Image();
 
-            const image =
-                new Image();
+    image.crossOrigin = "anonymous";
 
-
-            image.crossOrigin =
-                "anonymous";
-
-
-            image.onload =
-                () => resolve(image);
-
-
-            image.onerror =
-                reject;
-
-
-            image.src =
-                src;
-
-        }
-
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(
+      new Error("No se pudo cargar la imagen para el sellado.")
     );
 
+    image.src = src;
+  });
 }
-
 
 /* =========================================================
    MENSAJES
    ========================================================= */
 
 function setStatus(message){
-
-    $("status").textContent =
-        message;
-
+  $("status").textContent = message;
 }
 
-
 /* =========================================================
-   ARRANCAR
+   ARRANQUE
    ========================================================= */
 
-loadGithubImages()
+loadGithubImages().catch(error => {
 
-.catch(
+  console.error(error);
 
-    error => {
+  $("counter").textContent =
+    "No se pudieron cargar las estampillas.";
 
-        console.error(error);
-
-
-        $("counter").textContent =
-            "No se pudo cargar GitHub.";
-
-
-        setStatus(
-
-            error.message +
-
-            " Revisá la configuración de GitHub."
-
-        );
-
-    }
-
-);
-
+  setStatus(
+    error.message +
+    " Verificá que el repositorio sea público."
+  );
+});
 </script>
 
 </body>
