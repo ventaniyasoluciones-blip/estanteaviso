@@ -102,6 +102,7 @@
             text-shadow: 0 0 5px var(--neon-blue);
         }
 
+        /* GRILLA MÚLTIPLE DE 25+ AVISOS EN PANTALLA */
         .cartelera-multigrid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -195,8 +196,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
-
-        .gallery-section { display: flex; flex-direction: column; gap: 15px; }
 
         .grid-estampas {
             display: grid;
@@ -323,7 +322,6 @@
     </header>
 
     <div class="main-layout">
-        <!-- PANTALLA PRINCIPAL: GRILLA MULTIPLE -->
         <div class="display-section">
             <div class="section-title">Cartelera en Vivo (Estante de Avisos)</div>
             <div class="cartelera-multigrid" id="multigridContainer">
@@ -331,7 +329,6 @@
             </div>
         </div>
 
-        <!-- PANEL DE CONTROL -->
         <div class="editor-panel">
             <div class="editor-title">Panel de Control de Avisos</div>
             
@@ -360,7 +357,6 @@
 
             <div class="status-msg" id="statusMsg"></div>
 
-            <!-- BOTÓN 1: Deja fijo el aviso en la grilla. BOTÓN 2: Descarga -->
             <div class="btn-container">
                 <button class="btn-action" id="btnSetFixed">1. Dejar Fijo en Grilla</button>
                 <button class="btn-action btn-secondary" id="btnDownload">2. Descargar Estampa</button>
@@ -400,49 +396,55 @@
 
         async function cargarRepositorioAutomatico() {
             try {
-                // RUTA ACTUALIZADA AL NUEVO REPOSITORIO 'estanteaviso'
                 const response = await fetch('https://api.github.com/repos/ventaniyasoluciones-blip/estanteaviso/contents');
                 const files = await response.json();
-                listaImagenesGlobal = files.filter(file => file.type === 'file' && /\.(png|jpg|jpeg)$/i.test(file.name));
+                
+                // Filtramos solo imágenes válidas y armamos la URL directa de GitHub Raw
+                listaImagenesGlobal = files
+                    .filter(file => file.type === 'file' && /\.(png|jpg|jpeg)$/i.test(file.name))
+                    .map(file => ({
+                        name: file.name,
+                        url: `https://raw.githubusercontent.com/ventaniyasoluciones-blip/estanteaviso/main/${file.name}`
+                    }));
 
                 gridSelector.innerHTML = '';
                 if (listaImagenesGlobal.length === 0) {
-                    gridSelector.innerHTML = '<div style="color: var(--neon-pink);">No hay imágenes PNG/JPG en el repositorio.</div>';
+                    gridSelector.innerHTML = '<div style="color: var(--neon-pink);">No hay imágenes PNG/JPG.</div>';
                     multigridContainer.innerHTML = '<div style="color: var(--neon-pink);">Subí imágenes al repositorio estanteaviso.</div>';
                     return;
                 }
 
-                let savedImage = localStorage.getItem('ventaniya_image') || listaImagenesGlobal[0].name;
+                let savedImage = localStorage.getItem('ventaniya_image') || listaImagenesGlobal[0].url;
 
-                listaImagenesGlobal.forEach((file) => {
+                listaImagenesGlobal.forEach((imgObj) => {
                     const card = document.createElement('div');
-                    card.className = `estampa-card ${file.name === savedImage ? 'selected' : ''}`;
+                    card.className = `estampa-card ${imgObj.url === savedImage ? 'selected' : ''}`;
                     card.innerHTML = `
-                        <img class="estampa-thumb" src="${file.name}" alt="${file.name}" crossorigin="anonymous">
-                        <div class="estampa-info"><div class="estampa-name">${file.name}</div></div>
+                        <img class="estampa-thumb" src="${imgObj.url}" alt="${imgObj.name}" crossorigin="anonymous">
+                        <div class="estampa-info"><div class="estampa-name">${imgObj.name}</div></div>
                     `;
 
                     card.addEventListener('click', () => {
                         document.querySelectorAll('.estampa-card').forEach(c => c.classList.remove('selected'));
                         card.classList.add('selected');
-                        selectedPath = file.name;
+                        selectedPath = imgObj.url;
                     });
 
                     gridSelector.appendChild(card);
 
-                    if (file.name === savedImage) {
-                        selectedPath = file.name;
+                    if (imgObj.url === savedImage) {
+                        selectedPath = imgObj.url;
                     }
                 });
 
                 if (!selectedPath && listaImagenesGlobal.length > 0) {
-                    selectedPath = listaImagenesGlobal[0].name;
+                    selectedPath = listaImagenesGlobal[0].url;
                 }
 
                 renderMultigrid();
 
             } catch (error) {
-                multigridContainer.innerHTML = '<div style="color: var(--neon-pink);">Error al conectar con estanteaviso. Verificá que sea público.</div>';
+                multigridContainer.innerHTML = '<div style="color: var(--neon-pink);">Error al conectar. Verificá que el repositorio sea Público.</div>';
             }
         }
 
@@ -455,11 +457,12 @@
             const sMsg = localStorage.getItem('ventaniya_msg') || "@tucomercio";
             const featuredImage = localStorage.getItem('ventaniya_image') || selectedPath;
 
+            // Garantiza mínimo 25 celdas visibles en pantalla repitiendo las imágenes si hacen falta
             const totalCeldas = Math.max(25, listaImagenesGlobal.length);
 
             for (let i = 0; i < totalCeldas; i++) {
-                const fileObj = listaImagenesGlobal[i % listaImagenesGlobal.length];
-                const imgSource = fileObj ? fileObj.name : '';
+                const imgObj = listaImagenesGlobal[i % listaImagenesGlobal.length];
+                const imgSource = imgObj ? imgObj.url : '';
 
                 const cell = document.createElement('div');
                 cell.className = 'cartel-cell';
@@ -492,7 +495,7 @@
 
             renderMultigrid();
             const msg = document.getElementById('statusMsg');
-            msg.textContent = "¡Aviso fijado en el estante de la pantalla!";
+            msg.textContent = "¡Aviso fijado en la grilla de la pantalla!";
             setTimeout(() => { msg.textContent = ""; }, 3500);
         };
 
