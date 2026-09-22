@@ -196,7 +196,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 8px;
-            max-height: 35vh;
+            max-height: 30vh;
             overflow-y: auto;
             padding-right: 5px;
         }
@@ -211,6 +211,7 @@
             overflow: hidden;
             cursor: pointer;
             transition: all 0.2s ease;
+            position: relative;
         }
 
         .estampa-card:hover { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 243, 255, 0.4); }
@@ -254,6 +255,18 @@
             font-size: 0.95rem;
         }
 
+        .upload-box {
+            border: 2px dashed var(--neon-blue);
+            padding: 10px;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            background: rgba(0,243,255,0.05);
+            font-size: 0.75rem;
+            color: var(--neon-blue);
+        }
+        .upload-box:hover { background: rgba(0,243,255,0.15); }
+
         .btn-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -289,7 +302,7 @@
     <header>
         <div class="brand">
             <h1>VENTANIYA</h1>
-            <p>ESTANTE AVISO - MULTI-GRILLA EN VIVO</p>
+            <p>ESTANTE AVISO - MULTI-GRILLA LOCAL</p>
         </div>
         <div class="casio-clock-container">
             <div id="live-time" class="time-display">00:00:00.000</div>
@@ -326,14 +339,22 @@
                 <input type="text" id="sponsorMsg" value="@tucomercio">
             </div>
 
-            <div class="section-title" style="margin-top: 5px; font-size: 0.95rem;">Seleccionar Estampa Destacada:</div>
+            <div class="form-group">
+                <label>Subir Nuevas Imágenes:</label>
+                <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+                    + Cargar imágenes desde tu PC
+                </div>
+                <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+            </div>
+
+            <div class="section-title" style="font-size: 0.9rem;">Seleccionar Estampa:</div>
             <div class="grid-estampas" id="gridEstampas"></div>
 
             <div class="status-msg" id="statusMsg"></div>
 
             <div class="btn-container">
-                <button class="btn-action" id="btnSetFixed">1. Dejar Fijo en Grilla</button>
-                <button class="btn-action btn-secondary" id="btnDownload">2. Descargar Estampa</button>
+                <button class="btn-action" id="btnSetFixed">1. Fijar en Grilla</button>
+                <button class="btn-action btn-secondary" id="btnDownload">2. Descargar</button>
             </div>
         </div>
     </div>
@@ -358,23 +379,12 @@
         }
         setInterval(updateClock, 30);
 
-        // ==========================================
-        // LISTA DIRECTA DE TUS IMÁGENES EN EL REPO
-        // (Agregá o modificá los nombres exactos acá)
-        // ==========================================
-        const nombresImagenes = [
-            "aviso1.png",
-            "aviso2.png",
-            "estampa1.png",
-            "estampa2.png"
+        // Almacenamiento local de imágenes para evitar bloqueos CORS de GitHub
+        let listaImagenes = JSON.parse(localStorage.getItem('ventaniya_imagenes_db')) || [
+            { name: "ejemplo_aviso.png", data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' fill='%2300f3ff'><rect width='100%' height='100%' fill='%230b1120'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='14'>Sube tu aviso</text></svg>" }
         ];
 
-        let listaImagenesGlobal = nombresImagenes.map(nombre => ({
-            name: nombre,
-            url: `https://raw.githubusercontent.com/ventaniyasoluciones-blip/estanteaviso/main/${nombre}?v=` + new Date().getTime()
-        }));
-
-        let selectedPath = listaImagenesGlobal[0] ? listaImagenesGlobal[0].url : '';
+        let selectedIndex = 0;
         const gridSelector = document.getElementById('gridEstampas');
         const multigridContainer = document.getElementById('multigridContainer');
 
@@ -383,32 +393,27 @@
         if(localStorage.getItem('ventaniya_address')) document.getElementById('sponsorAddress').value = localStorage.getItem('ventaniya_address');
         if(localStorage.getItem('ventaniya_msg')) document.getElementById('sponsorMsg').value = localStorage.getItem('ventaniya_msg');
 
-        let savedImage = localStorage.getItem('ventaniya_image');
+        let savedIndex = localStorage.getItem('ventaniya_img_index');
+        if(savedIndex !== null) selectedIndex = parseInt(savedIndex);
 
         function inicializarSistema() {
             gridSelector.innerHTML = '';
             
-            listaImagenesGlobal.forEach((imgObj) => {
+            listaImagenes.forEach((imgObj, idx) => {
                 const card = document.createElement('div');
-                const esSeleccionada = savedImage ? imgObj.url.split('?')[0] === savedImage.split('?')[0] : imgObj.url === selectedPath;
-                
-                card.className = `estampa-card ${esSeleccionada ? 'selected' : ''}`;
+                card.className = `estampa-card ${idx === selectedIndex ? 'selected' : ''}`;
                 card.innerHTML = `
-                    <img class="estampa-thumb" src="${imgObj.url}" alt="${imgObj.name}" crossorigin="anonymous">
+                    <img class="estampa-thumb" src="${imgObj.data}" alt="${imgObj.name}">
                     <div class="estampa-info"><div class="estampa-name">${imgObj.name}</div></div>
                 `;
 
                 card.addEventListener('click', () => {
                     document.querySelectorAll('.estampa-card').forEach(c => c.classList.remove('selected'));
                     card.classList.add('selected');
-                    selectedPath = imgObj.url;
+                    selectedIndex = idx;
                 });
 
                 gridSelector.appendChild(card);
-
-                if (esSeleccionada) {
-                    selectedPath = imgObj.url;
-                }
             });
 
             renderMultigrid();
@@ -421,22 +426,20 @@
             const sPhone = localStorage.getItem('ventaniya_phone') || "+54 9 11 0000-0000";
             const sAddress = localStorage.getItem('ventaniya_address') || "Av. Principal 123";
             const sMsg = localStorage.getItem('ventaniya_msg') || "@tucomercio";
-            const featuredImage = localStorage.getItem('ventaniya_image') || selectedPath;
+            let activeIdx = localStorage.getItem('ventaniya_img_index') !== null ? parseInt(localStorage.getItem('ventaniya_img_index')) : selectedIndex;
 
-            const totalCeldas = Math.max(25, listaImagenesGlobal.length);
+            const totalCeldas = Math.max(20, listaImagenes.length);
 
             for (let i = 0; i < totalCeldas; i++) {
-                const imgObj = listaImagenesGlobal[i % listaImagenesGlobal.length];
-                const imgSource = imgObj ? imgObj.url : '';
-
+                const imgObj = listaImagenes[i % listaImagenes.length];
                 const cell = document.createElement('div');
                 cell.className = 'cartel-cell';
 
-                const esDestacada = featuredImage && imgSource.split('?')[0] === featuredImage.split('?')[0];
+                const esDestacada = (i % listaImagenes.length) === activeIdx;
 
                 cell.innerHTML = `
                     <div class="cartel-img-container">
-                        <img src="${imgSource}" alt="Estampa" crossorigin="anonymous">
+                        <img src="${imgObj.data}" alt="Estampa">
                         <div class="cartel-badge">VTN<br>${i+1}</div>
                     </div>
                     <div class="cartel-info-box">
@@ -450,18 +453,42 @@
             }
         }
 
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (!files.length) return;
+
+            let cargados = 0;
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    listaImagenes.push({
+                        name: file.name,
+                        data: event.target.result
+                    });
+                    cargados++;
+                    if(cargados === files.length) {
+                        localStorage.setItem('ventaniya_imagenes_db', JSON.stringify(listaImagenes));
+                        inicializarSistema();
+                        const msg = document.getElementById('statusMsg');
+                        msg.textContent = "¡Imágenes cargadas con éxito!";
+                        setTimeout(() => { msg.textContent = ""; }, 3000);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
         document.getElementById('btnSetFixed').onclick = () => {
-            if(!selectedPath) return;
             localStorage.setItem('ventaniya_name', document.getElementById('sponsorName').value);
             localStorage.setItem('ventaniya_phone', document.getElementById('sponsorPhone').value);
             localStorage.setItem('ventaniya_address', document.getElementById('sponsorAddress').value);
             localStorage.setItem('ventaniya_msg', document.getElementById('sponsorMsg').value);
-            localStorage.setItem('ventaniya_image', selectedPath);
+            localStorage.setItem('ventaniya_img_index', selectedIndex);
 
             renderMultigrid();
             const msg = document.getElementById('statusMsg');
             msg.textContent = "¡Aviso fijado en la grilla!";
-            setTimeout(() => { msg.textContent = ""; }, 3500);
+            setTimeout(() => { msg.textContent = ""; }, 3000);
         };
 
         document.getElementById('btnDownload').onclick = () => {
@@ -469,9 +496,11 @@
             const msg = document.getElementById('statusMsg');
             msg.textContent = "Generando descarga...";
             setTimeout(() => {
+                let activeIdx = localStorage.getItem('ventaniya_img_index') !== null ? parseInt(localStorage.getItem('ventaniya_img_index')) : selectedIndex;
+                const targetImg = listaImagenes[activeIdx] || listaImagenes[0];
+
                 const img = new Image();
-                img.crossOrigin = "anonymous";
-                img.src = localStorage.getItem('ventaniya_image') || selectedPath;
+                img.src = targetImg.data;
                 
                 img.onload = () => {
                     const canvas = document.getElementById('hidden-canvas');
