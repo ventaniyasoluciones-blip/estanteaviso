@@ -181,11 +181,7 @@
             text-overflow: ellipsis;
         }
 
-        .c-detail {
-            font-size: 0.72rem;
-            color: var(--neon-white);
-        }
-
+        .c-detail { font-size: 0.72rem; color: var(--neon-white); }
         .c-msg {
             font-size: 0.72rem;
             color: var(--neon-pink);
@@ -217,15 +213,8 @@
             transition: all 0.2s ease;
         }
 
-        .estampa-card:hover {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
-        }
-
-        .estampa-card.selected {
-            border-color: var(--neon-pink);
-            box-shadow: 0 0 12px var(--neon-pink);
-        }
+        .estampa-card:hover { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 243, 255, 0.4); }
+        .estampa-card.selected { border-color: var(--neon-pink); box-shadow: 0 0 12px var(--neon-pink); }
 
         .estampa-thumb { width: 100%; height: 90px; object-fit: cover; background: #000; display: block; }
         .estampa-info { padding: 4px; font-size: 0.65rem; text-align: center; }
@@ -282,7 +271,6 @@
             border-radius: 4px;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
             transition: all 0.2s;
             text-align: center;
@@ -290,21 +278,10 @@
         }
 
         .btn-action:hover { background: #fff; color: #000; box-shadow: 0 0 15px #fff; }
-
-        .btn-secondary {
-            background: linear-gradient(90deg, #ff007f, #aa0055);
-            color: #fff;
-            box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
-        }
+        .btn-secondary { background: linear-gradient(90deg, #ff007f, #aa0055); color: #fff; box-shadow: 0 0 10px rgba(255, 0, 127, 0.5); }
         .btn-secondary:hover { background: #fff; color: #000; box-shadow: 0 0 15px #fff; }
 
-        .status-msg {
-            font-size: 0.75rem;
-            color: #00f3ff;
-            text-align: center;
-            min-height: 1rem;
-            font-weight: bold;
-        }
+        .status-msg { font-size: 0.75rem; color: #00f3ff; text-align: center; min-height: 1rem; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -323,9 +300,7 @@
     <div class="main-layout">
         <div class="display-section">
             <div class="section-title">Cartelera en Vivo (Estante de Avisos)</div>
-            <div class="cartelera-multigrid" id="multigridContainer">
-                <div style="color: var(--neon-blue); padding: 15px;">Cargando avisos del estante...</div>
-            </div>
+            <div class="cartelera-multigrid" id="multigridContainer"></div>
         </div>
 
         <div class="editor-panel">
@@ -383,8 +358,23 @@
         }
         setInterval(updateClock, 30);
 
-        let listaImagenesGlobal = [];
-        let selectedPath = null;
+        // ==========================================
+        // LISTA DIRECTA DE TUS IMÁGENES EN EL REPO
+        // (Agregá o modificá los nombres exactos acá)
+        // ==========================================
+        const nombresImagenes = [
+            "aviso1.png",
+            "aviso2.png",
+            "estampa1.png",
+            "estampa2.png"
+        ];
+
+        let listaImagenesGlobal = nombresImagenes.map(nombre => ({
+            name: nombre,
+            url: `https://raw.githubusercontent.com/ventaniyasoluciones-blip/estanteaviso/main/${nombre}?v=` + new Date().getTime()
+        }));
+
+        let selectedPath = listaImagenesGlobal[0] ? listaImagenesGlobal[0].url : '';
         const gridSelector = document.getElementById('gridEstampas');
         const multigridContainer = document.getElementById('multigridContainer');
 
@@ -393,48 +383,16 @@
         if(localStorage.getItem('ventaniya_address')) document.getElementById('sponsorAddress').value = localStorage.getItem('ventaniya_address');
         if(localStorage.getItem('ventaniya_msg')) document.getElementById('sponsorMsg').value = localStorage.getItem('ventaniya_msg');
 
-        async function cargarRepositorioAutomatico() {
-            try {
-                // Intentamos leer directo de la API de GitHub
-                const response = await fetch('https://api.github.com/repos/ventaniyasoluciones-blip/estanteaviso/contents');
-                if (!response.ok) throw new Error('API Rate Limit o repositorio privado');
-                
-                const files = await response.json();
-                
-                listaImagenesGlobal = files
-                    .filter(file => file.type === 'file' && /\.(png|jpg|jpeg)$/i.test(file.name))
-                    .map(file => ({
-                        name: file.name,
-                        url: `https://raw.githubusercontent.com/ventaniyasoluciones-blip/estanteaviso/main/${file.name}?v=` + new Date().getTime()
-                    }));
+        let savedImage = localStorage.getItem('ventaniya_image');
 
-            } catch (error) {
-                // RESPALDO DE EMERGENCIA LOCAL SI LA API FALLA:
-                // Si agregás nuevas imágenes, simplemente sumalas a este array por nombre exacto.
-                console.warn("Usando respaldo estático debido a restricciones de la API de GitHub.");
-                const nombresRespaldados = ["aviso1.png", "aviso2.png", "estampa1.png", "estampa2.png", "cartel1.jpg", "cartel2.jpg"];
-                
-                listaImagenesGlobal = [];
-                for(let nom of nombresRespaldados) {
-                    listaImagenesGlobal.push({
-                        name: nom,
-                        url: `https://raw.githubusercontent.com/ventaniyasoluciones-blip/estanteaviso/main/${nom}?v=` + new Date().getTime()
-                    });
-                }
-            }
-
+        function inicializarSistema() {
             gridSelector.innerHTML = '';
-            if (listaImagenesGlobal.length === 0) {
-                gridSelector.innerHTML = '<div style="color: var(--neon-pink);">No se detectaron imágenes.</div>';
-                multigridContainer.innerHTML = '<div style="color: var(--neon-pink);">Subí imágenes PNG o JPG al repositorio.</div>';
-                return;
-            }
-
-            let savedImage = localStorage.getItem('ventaniya_image');
-
+            
             listaImagenesGlobal.forEach((imgObj) => {
                 const card = document.createElement('div');
-                card.className = `estampa-card ${imgObj.url.split('?')[0] === (savedImage ? savedImage.split('?')[0] : '') ? 'selected' : ''}`;
+                const esSeleccionada = savedImage ? imgObj.url.split('?')[0] === savedImage.split('?')[0] : imgObj.url === selectedPath;
+                
+                card.className = `estampa-card ${esSeleccionada ? 'selected' : ''}`;
                 card.innerHTML = `
                     <img class="estampa-thumb" src="${imgObj.url}" alt="${imgObj.name}" crossorigin="anonymous">
                     <div class="estampa-info"><div class="estampa-name">${imgObj.name}</div></div>
@@ -448,14 +406,10 @@
 
                 gridSelector.appendChild(card);
 
-                if (!selectedPath && imgObj.url.split('?')[0] === (savedImage ? savedImage.split('?')[0] : '')) {
+                if (esSeleccionada) {
                     selectedPath = imgObj.url;
                 }
             });
-
-            if (!selectedPath && listaImagenesGlobal.length > 0) {
-                selectedPath = listaImagenesGlobal[0].url;
-            }
 
             renderMultigrid();
         }
@@ -467,7 +421,7 @@
             const sPhone = localStorage.getItem('ventaniya_phone') || "+54 9 11 0000-0000";
             const sAddress = localStorage.getItem('ventaniya_address') || "Av. Principal 123";
             const sMsg = localStorage.getItem('ventaniya_msg') || "@tucomercio";
-            const featuredImage = localStorage.getItem('ventaniya_image');
+            const featuredImage = localStorage.getItem('ventaniya_image') || selectedPath;
 
             const totalCeldas = Math.max(25, listaImagenesGlobal.length);
 
@@ -478,12 +432,11 @@
                 const cell = document.createElement('div');
                 cell.className = 'cartel-cell';
 
-                // Comparamos ignorando los parámetros de caché
                 const esDestacada = featuredImage && imgSource.split('?')[0] === featuredImage.split('?')[0];
 
                 cell.innerHTML = `
                     <div class="cartel-img-container">
-                        <img src="${imgSource}" alt="Estampa" crossorigin="anonymous" onerror="this.src='https://raw.githubusercontent.com/ventaniyasoluciones-blip/estanteaviso/main/placeholder.png';">
+                        <img src="${imgSource}" alt="Estampa" crossorigin="anonymous">
                         <div class="cartel-badge">VTN<br>${i+1}</div>
                     </div>
                     <div class="cartel-info-box">
@@ -507,7 +460,7 @@
 
             renderMultigrid();
             const msg = document.getElementById('statusMsg');
-            msg.textContent = "¡Aviso fijado en la grilla correctamente!";
+            msg.textContent = "¡Aviso fijado en la grilla!";
             setTimeout(() => { msg.textContent = ""; }, 3500);
         };
 
@@ -558,7 +511,7 @@
             }, 200);
         };
 
-        cargarRepositorioAutomatico();
+        inicializarSistema();
     </script>
 </body>
 </html>
