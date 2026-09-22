@@ -301,7 +301,7 @@
 <header>
     <div class="brand">
         <h1>VENTANIYA</h1>
-        <p>ESTANTE AVISO - CONTROL DIRECTO</p>
+        <p>ESTANTE AVISO - GITHUB PAGES SYNC</p>
     </div>
     <div class="casio-clock-container">
         <div id="live-time" class="time-display">00:00:00.000</div>
@@ -311,7 +311,7 @@
 
 <div class="main-layout">
     <div class="display-section">
-        <div class="section-title">Cartelera en Vivo (Estante de Avisos)</div>
+        <div class="section-title">Cartelera en Vivo</div>
         <div class="cartelera-multigrid" id="multigridContainer"></div>
     </div>
 
@@ -376,12 +376,14 @@
     }
     setInterval(updateClock, 30);
 
-    // Repositorio base de imágenes por defecto (si subes imágenes a tu carpeta de GitHub, puedes agregarlas aquí como 'assets/tu-imagen.png')
+    // Lista por defecto con respaldo seguro codificado en SVG incrustado (garantiza que NUNCA falle por error 404 en GitHub Pages)
     let defaultImages = [
-        { name: "aviso_base.png", data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' fill='%2300f3ff'><rect width='100%' height='100%' fill='%230b1120'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='16' fill='%2300f3ff'>VENTANIYA REPO</text></svg>" }
+        { 
+          name: "aviso_base_1.png", 
+          data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%' height='100%' fill='%23050814'/><rect x='20' y='20' width='360' height='360' fill='none' stroke='%2300f3ff' stroke-width='3'/><text x='50%' y='45%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='22' fill='%2300f3ff' font-weight='bold'>VENTANIYA</text><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='14' fill='%23ff007f'>ESTANTE AVISO</text></svg>" 
+        }
     ];
 
-    // Carga segura desde localStorage con respaldo
     let storedImages = JSON.parse(localStorage.getItem('ventaniya_imagenes_db'));
     let listaImagenes = (storedImages && storedImages.length > 0) ? storedImages : defaultImages;
 
@@ -403,7 +405,7 @@
             const card = document.createElement('div');
             card.className = `estampa-card ${idx === selectedIndex ? 'selected' : ''}`;
             card.innerHTML = `
-                <img class="estampa-thumb" src="${imgObj.data}" alt="${imgObj.name}">
+                <img class="estampa-thumb" src="${imgObj.data}" alt="${imgObj.name}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23330000\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' font-size=\\'10\\' fill=\\'%23ff0000\\'>ERROR 404</text></svg>'">
                 <div class="estampa-info"><div class="estampa-name">${imgObj.name}</div></div>
             `;
 
@@ -439,7 +441,7 @@
 
             cell.innerHTML = `
                 <div class="cartel-img-container">
-                    <img src="${imgObj.data}" alt="Estampa">
+                    <img src="${imgObj.data}" alt="Estampa" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%23330000\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' font-size=\\'10\\' fill=\\'%23ff0000\\'>NO ENCONTRADA</text></svg>'">
                     <div class="cartel-badge">VTN<br>${i+1}</div>
                 </div>
                 <div class="cartel-info-box">
@@ -453,7 +455,7 @@
         }
     }
 
-    // Lector robusto de archivos subidos
+    // Procesamiento inmediato de archivos cargados por el usuario
     document.getElementById('fileInput').addEventListener('change', (e) => {
         const files = e.target.files;
         if (!files.length) return;
@@ -471,7 +473,7 @@
                     localStorage.setItem('ventaniya_imagenes_db', JSON.stringify(listaImagenes));
                     inicializarSistema();
                     const msg = document.getElementById('statusMsg');
-                    msg.textContent = "¡Imágenes sincronizadas y visibles!";
+                    msg.textContent = "¡Imágenes sincronizadas correctamente!";
                     setTimeout(() => { msg.textContent = ""; }, 2500);
                 }
             };
@@ -479,7 +481,6 @@
         });
     });
 
-    // BOTÓN 1: FIJAR AVISO
     document.getElementById('btnSetFixed').onclick = () => {
         localStorage.setItem('ventaniya_name', document.getElementById('sponsorName').value);
         localStorage.setItem('ventaniya_phone', document.getElementById('sponsorPhone').value);
@@ -493,7 +494,6 @@
         setTimeout(() => { msg.textContent = ""; }, 2500);
     };
 
-    // BOTÓN 2: DESCARGAR ESTAMPA CON SELLO ATÓMICO Y HASH
     document.getElementById('btnDownload').onclick = () => {
         const msg = document.getElementById('statusMsg');
         msg.textContent = "Generando estampa...";
@@ -514,7 +514,6 @@
 
                 ctx.drawImage(img, 0, 0, canvas.width, 480);
                 
-                // Recuadro de diseño de marca y datos
                 const boxX = 15, boxY = 485, boxW = 570, boxH = 150;
                 ctx.fillStyle = "rgba(5, 8, 20, 0.96)";
                 ctx.strokeStyle = "#00f3ff";
@@ -522,7 +521,6 @@
                 ctx.fillRect(boxX, boxY, boxW, boxH);
                 ctx.strokeRect(boxX, boxY, boxW, boxH);
 
-                // Textos comerciales principales
                 ctx.font = "bold 18px 'Orbitron', monospace";
                 ctx.fillStyle = "#00f3ff";
                 ctx.fillText(localStorage.getItem('ventaniya_name'), boxX + 20, boxY + 30);
@@ -535,7 +533,6 @@
                 ctx.fillStyle = "#ff007f";
                 ctx.fillText(localStorage.getItem('ventaniya_msg'), boxX + 20, boxY + 95);
 
-                // Sello de tiempo Atómico con milisegundos y Hash Único
                 const now = new Date();
                 const timeString = now.toISOString().replace('T', ' ').substring(0, 23) + `.${String(now.getMilliseconds()).padStart(3, '0')}`;
                 const hashId = 'VTN-ATOMIC-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + now.getTime();
