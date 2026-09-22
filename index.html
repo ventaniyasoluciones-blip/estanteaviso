@@ -100,46 +100,62 @@
             border-left: 4px solid var(--neon-blue);
             padding-left: 10px;
             text-shadow: 0 0 5px var(--neon-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .cartelera-multigrid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 15px;
             background: #000;
             border: 2px solid var(--neon-blue);
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
-            max-height: 80vh;
+            max-height: 75vh;
             overflow-y: auto;
         }
 
         .cartelera-multigrid::-webkit-scrollbar { width: 8px; }
         .cartelera-multigrid::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 4px; }
 
+        /* Estructura dividida: Imagen + Panel Lateral Fijo con Datos y Logo */
         .cartel-cell {
             background: var(--panel-bg);
             border: 1px solid var(--neon-blue);
             border-radius: 6px;
             overflow: hidden;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             position: relative;
             box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
         }
 
+        .cartel-cell.selected-print {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 12px var(--neon-pink);
+        }
+
+        .cartel-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: #000;
+            min-height: 180px;
+        }
+
         .cartel-img-container {
             width: 100%;
-            height: 180px;
-            background: #000;
-            position: relative;
+            height: 100%;
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* CLAVE: object-fit: contain para que NUNCA se corte la imagen */
         .cartel-img-container img {
             width: 100%;
             height: 100%;
@@ -147,60 +163,82 @@
             display: block;
         }
 
-        .cartel-badge {
+        /* Checkbox flotante para impresión selectiva */
+        .print-checkbox-container {
             position: absolute;
             top: 5px;
-            right: 5px;
+            left: 5px;
+            background: rgba(0,0,0,0.85);
             border: 1px solid var(--neon-blue);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            background: rgba(0,0,0,0.8);
-            color: var(--neon-blue);
-            font-size: 6px;
-            font-family: 'Orbitron', sans-serif;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
             display: flex;
             align-items: center;
-            justify-content: center;
-            text-align: center;
-            box-shadow: 0 0 5px var(--neon-blue);
+            gap: 4px;
+            z-index: 10;
+            cursor: pointer;
         }
 
-        .cartel-info-box {
-            padding: 10px;
-            background: rgba(5, 8, 20, 0.95);
-            border-top: 1px solid var(--neon-blue);
+        .print-checkbox-container input {
+            cursor: pointer;
+            accent-color: var(--neon-pink);
+        }
+
+        /* Panel lateral fijo dentro de cada tarjeta con datos y logo */
+        .cartel-right-fixed {
+            width: 130px;
+            background: rgba(5, 8, 20, 0.98);
+            border-left: 1px solid var(--neon-blue);
+            padding: 8px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .sponsor-brand-box {
+            text-align: center;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 4px;
+        }
+
+        .sponsor-logo-mini {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            color: var(--neon-pink);
+            font-weight: 900;
+            text-shadow: 0 0 4px var(--neon-pink);
         }
 
         .c-name {
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             color: var(--neon-blue);
-            text-shadow: 0 0 4px var(--neon-blue);
-            white-space: nowrap;
+            text-shadow: 0 0 3px var(--neon-blue);
             overflow: hidden;
             text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
 
-        .c-detail { font-size: 0.72rem; color: var(--neon-white); }
+        .c-detail { font-size: 0.65rem; color: var(--neon-white); word-break: break-all; }
         .c-msg {
-            font-size: 0.72rem;
+            font-size: 0.65rem;
             color: var(--neon-pink);
-            text-shadow: 0 0 4px var(--neon-pink);
+            text-shadow: 0 0 3px var(--neon-pink);
             font-weight: bold;
-            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .grid-estampas {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 8px;
-            max-height: 28vh;
+            max-height: 25vh;
             overflow-y: auto;
             padding-right: 5px;
         }
@@ -215,14 +253,28 @@
             overflow: hidden;
             cursor: pointer;
             transition: all 0.2s ease;
+            position: relative;
         }
 
         .estampa-card:hover { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 243, 255, 0.4); }
         .estampa-card.selected { border-color: var(--neon-pink); box-shadow: 0 0 12px var(--neon-pink); }
 
-        .estampa-thumb { width: 100%; height: 90px; object-fit: contain; background: #000; display: block; }
-        .estampa-info { padding: 4px; font-size: 0.65rem; text-align: center; }
+        .estampa-thumb { width: 100%; height: 80px; object-fit: contain; background: #000; display: block; }
+        .estampa-info { padding: 4px; font-size: 0.6rem; text-align: center; }
         .estampa-name { color: var(--neon-blue); font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .btn-delete-img {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(255,0,127,0.8);
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            font-size: 9px;
+            padding: 1px 4px;
+            cursor: pointer;
+        }
 
         .editor-panel {
             background: var(--panel-bg);
@@ -232,7 +284,7 @@
             padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             height: fit-content;
         }
 
@@ -245,17 +297,17 @@
             padding-bottom: 6px;
         }
 
-        .form-group { display: flex; flex-direction: column; gap: 4px; }
-        .form-group label { font-size: 0.8rem; color: var(--neon-blue); letter-spacing: 1px; font-weight: bold; }
+        .form-group { display: flex; flex-direction: column; gap: 3px; }
+        .form-group label { font-size: 0.75rem; color: var(--neon-blue); letter-spacing: 1px; font-weight: bold; }
         
         .form-group input {
             background: #000;
             border: 1px solid var(--neon-blue);
             color: var(--neon-white);
-            padding: 8px;
+            padding: 6px 8px;
             border-radius: 4px;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .upload-box {
@@ -273,7 +325,7 @@
         .btn-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
             margin-top: 5px;
         }
 
@@ -283,14 +335,14 @@
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
             border: none;
-            padding: 12px 6px;
+            padding: 10px 4px;
             border-radius: 4px;
             cursor: pointer;
             text-transform: uppercase;
             box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
             transition: all 0.2s;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
 
         .btn-action:hover { background: #fff; color: #000; box-shadow: 0 0 15px #fff; }
@@ -298,6 +350,36 @@
         .btn-secondary:hover { background: #fff; color: #000; box-shadow: 0 0 15px #fff; }
 
         .status-msg { font-size: 0.75rem; color: #00f3ff; text-align: center; min-height: 1rem; font-weight: bold; }
+
+        /* Estilos específicos para impresión (Imprime solo lo seleccionado) */
+        @media print {
+            body { background: #fff; color: #000; }
+            header, .editor-panel, .print-checkbox-container, .btn-delete-img, .section-title button { display: none !important; }
+            .main-layout { display: block; padding: 0; }
+            .cartelera-multigrid {
+                border: none;
+                box-shadow: none;
+                background: #fff;
+                display: block;
+                max-height: none;
+                overflow: visible;
+            }
+            .cartel-cell {
+                page-break-inside: avoid;
+                margin-bottom: 20px;
+                border: 2px solid #000 !important;
+                background: #fff !important;
+                display: flex !important;
+            }
+            .cartel-right-fixed {
+                background: #f1f5f9 !important;
+                border-left: 2px solid #000 !important;
+                color: #000 !important;
+            }
+            .c-name, .sponsor-logo-mini { color: #000 !important; text-shadow: none !important; }
+            .c-msg { color: #d90429 !important; text-shadow: none !important; }
+            .cartel-cell:not(.print-selected-cell) { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -315,16 +397,19 @@
 
 <div class="main-layout">
     <div class="display-section">
-        <div class="section-title">Cartelera en Vivo (Imágenes Cargadas)</div>
+        <div class="section-title">
+            Cartelera en Vivo (Tus Avisos)
+            <button class="btn-action" style="padding: 4px 10px; font-size: 0.65rem;" onclick="imprimirSeleccionados()">🖨️ Imprimir Seleccionados</button>
+        </div>
         <div class="cartelera-multigrid" id="multigridContainer"></div>
     </div>
 
     <div class="editor-panel">
-        <div class="editor-title">Panel de Control</div>
+        <div class="editor-title">Panel de Control & Auspicio</div>
         
         <div class="form-group">
-            <label>Nombre del Comercio:</label>
-            <input type="text" id="sponsorName" value="COMERCIO AUSPICIANTE">
+            <label>Nombre del Comercio / Logo Texto:</label>
+            <input type="text" id="sponsorName" value="VENTANIYA AVISOS">
         </div>
 
         <div class="form-group">
@@ -339,7 +424,7 @@
 
         <div class="form-group">
             <label>Instagram / Mensaje:</label>
-            <input type="text" id="sponsorMsg" value="@tucomercio">
+            <input type="text" id="sponsorMsg" value="@ventaniya">
         </div>
 
         <div class="form-group">
@@ -348,19 +433,17 @@
             <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
         </div>
 
-        <div class="section-title" style="font-size: 0.9rem;">Seleccionar Estampa:</div>
+        <div class="section-title" style="font-size: 0.85rem; border-left-color: var(--neon-pink);">Administrar Repositorio:</div>
         <div class="grid-estampas" id="gridEstampas"></div>
 
         <div class="status-msg" id="statusMsg"></div>
 
         <div class="btn-container">
-            <button class="btn-action" id="btnSetFixed">1. Fijar Aviso</button>
-            <button class="btn-action btn-secondary" id="btnDownload">2. Descargar Estampa</button>
+            <button class="btn-action" id="btnSetFixed">1. Actualizar Datos</button>
+            <button class="btn-action btn-secondary" id="btnResetDefault">2. Reset Guía</button>
         </div>
     </div>
 </div>
-
-<canvas id="hidden-canvas" style="display:none;"></canvas>
 
 <script>
     const mesesShort = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV", "DIC"];
@@ -380,17 +463,15 @@
     }
     setInterval(updateClock, 30);
 
-    // Si no hay nada cargado previamente, arranca limpio o con una imagen guía por defecto
     let defaultImages = [
         { 
-          name: "guia_inicial.svg", 
-          data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%' height='100%' fill='%23050814'/><rect x='20' y='20' width='360' height='360' fill='none' stroke='%2300f3ff' stroke-width='3'/><text x='50%' y='45%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='20' fill='%2300f3ff' font-weight='bold'>SUBE TUS FOTOS</text><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='12' fill='%23ff007f'>AQUÍ ABAJO</text></svg>" 
+            name: "guia_inicial.svg", 
+            data: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%' height='100% ' fill='%23050814'/><rect x='20' y='20' width='360' height='360' fill='none' stroke='%2300f3ff' stroke-width='3'/><text x='50%' y='45%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='20' fill='%2300f3ff' font-weight='bold'>SUBE TUS FOTOS</text><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='monospace' font-size='12' fill='%23ff007f'>AQUÍ ABAJO</text></svg>" 
         }
     ];
 
     let storedImages = JSON.parse(localStorage.getItem('ventaniya_imagenes_db'));
     let listaImagenes = (storedImages && storedImages.length > 0) ? storedImages : defaultImages;
-
     let selectedIndex = parseInt(localStorage.getItem('ventaniya_img_index')) || 0;
     if (selectedIndex >= listaImagenes.length) selectedIndex = 0;
 
@@ -409,6 +490,7 @@
             const card = document.createElement('div');
             card.className = `estampa-card ${idx === selectedIndex ? 'selected' : ''}`;
             card.innerHTML = `
+                <button class="btn-delete-img" title="Eliminar imagen" onclick="event.stopPropagation(); eliminarImagen(${idx});">X</button>
                 <img class="estampa-thumb" src="${imgObj.data}" alt="${imgObj.name}">
                 <div class="estampa-info"><div class="estampa-name">${imgObj.name}</div></div>
             `;
@@ -428,36 +510,62 @@
     function renderMultigrid() {
         multigridContainer.innerHTML = '';
 
-        const sName = (localStorage.getItem('ventaniya_name') || "COMERCIO AUSPICIANTE").toUpperCase();
+        const sName = (localStorage.getItem('ventaniya_name') || "VENTANIYA AVISOS").toUpperCase();
         const sPhone = localStorage.getItem('ventaniya_phone') || "+54 9 11 0000-0000";
         const sAddress = localStorage.getItem('ventaniya_address') || "Av. Principal 123";
-        const sMsg = localStorage.getItem('ventaniya_msg') || "@tucomercio";
-        let activeIdx = localStorage.getItem('ventaniya_img_index') !== null ? parseInt(localStorage.getItem('ventaniya_img_index')) : selectedIndex;
+        const sMsg = localStorage.getItem('ventaniya_msg') || "@ventaniya";
 
-        // Muestra estrictamente las imágenes cargadas de forma dinámica una por una
         listaImagenes.forEach((imgObj, i) => {
             const cell = document.createElement('div');
             cell.className = 'cartel-cell';
-
-            const esDestacada = (i === activeIdx);
+            cell.id = `cartel-cell-${i}`;
 
             cell.innerHTML = `
-                <div class="cartel-img-container">
-                    <img src="${imgObj.data}" alt="${imgObj.name}">
-                    <div class="cartel-badge">VTN<br>${i+1}</div>
+                <div class="cartel-left">
+                    <label class="print-checkbox-container" title="Marcar para imprimir">
+                        <input type="checkbox" class="print-select-chk" data-index="${i}" onchange="togglePrintCell(${i})"> Imprimir
+                    </label>
+                    <div class="cartel-img-container">
+                        <img src="${imgObj.data}" alt="${imgObj.name}">
+                    </div>
                 </div>
-                <div class="cartel-info-box">
-                    <div class="c-name">${esDestacada ? sName : `AVISO #${i+1}`}</div>
-                    <div class="c-detail">${esDestacada ? sPhone : 'Tel: Disponible'}</div>
-                    <div class="c-detail">${esDestacada ? sAddress : 'Zona Comercial'}</div>
-                    <div class="c-msg">${esDestacada ? sMsg : imgObj.name}</div>
+                <div class="cartel-right-fixed">
+                    <div class="sponsor-brand-box">
+                        <div class="sponsor-logo-mini">VTN AVISO</div>
+                    </div>
+                    <div>
+                        <div class="c-name" title="${sName}">${sName}</div>
+                        <div class="c-detail">${sPhone}</div>
+                        <div class="c-detail">${sAddress}</div>
+                    </div>
+                    <div class="c-msg" title="${sMsg}">${sMsg}</div>
                 </div>
             `;
             multigridContainer.appendChild(cell);
         });
     }
 
-    // Carga de archivos nuevos desde PC en tiempo real sin repeticiones tontas
+    function togglePrintCell(idx) {
+        const cell = document.getElementById(`cartel-cell-${idx}`);
+        const chk = cell.querySelector('.print-select-chk');
+        if (chk.checked) {
+            cell.classList.add('selected-print', 'print-selected-cell');
+        } else {
+            cell.classList.remove('selected-print', 'print-selected-cell');
+        }
+    }
+
+    function eliminarImagen(idx) {
+        if(listaImagenes.length <= 1) {
+            alert("Debe quedar al menos una imagen en el sistema.");
+            return;
+        }
+        listaImagenes.splice(idx, 1);
+        localStorage.setItem('ventaniya_imagenes_db', JSON.stringify(listaImagenes));
+        if(selectedIndex >= listaImagenes.length) selectedIndex = 0;
+        inicializarSistema();
+    }
+
     document.getElementById('fileInput').addEventListener('change', (e) => {
         const files = e.target.files;
         if (!files.length) return;
@@ -466,7 +574,6 @@
         Array.from(files).forEach(file => {
             const reader = new FileReader();
             reader.onload = function(event) {
-                // Si la única imagen era la guía inicial por defecto, la reemplazamos con la primera real subida
                 if(listaImagenes.length === 1 && listaImagenes[0].name === "guia_inicial.svg") {
                     listaImagenes = [];
                 }
@@ -481,7 +588,7 @@
                     localStorage.setItem('ventaniya_imagenes_db', JSON.stringify(listaImagenes));
                     inicializarSistema();
                     const msg = document.getElementById('statusMsg');
-                    msg.textContent = "¡Imágenes agregadas a la cartelera!";
+                    msg.textContent = "¡Imágenes agregadas correctamente!";
                     setTimeout(() => { msg.textContent = ""; }, 2500);
                 }
             };
@@ -498,79 +605,27 @@
 
         renderMultigrid();
         const msg = document.getElementById('statusMsg');
-        msg.textContent = "¡Aviso fijado correctamente!";
+        msg.textContent = "¡Datos actualizados con éxito!";
         setTimeout(() => { msg.textContent = ""; }, 2500);
     };
 
-    document.getElementById('btnDownload').onclick = () => {
-        const msg = document.getElementById('statusMsg');
-        msg.textContent = "Generando estampa...";
-        
-        setTimeout(() => {
-            let activeIdx = localStorage.getItem('ventaniya_img_index') !== null ? parseInt(localStorage.getItem('ventaniya_img_index')) : selectedIndex;
-            const targetImg = listaImagenes[activeIdx] || listaImagenes[0];
-
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.src = targetImg.data;
-            
-            img.onload = () => {
-                const canvas = document.getElementById('hidden-canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = 600;
-                canvas.height = 650;
-
-                // Fondo negro para respetar la proporción completa de la imagen sin distorsión
-                ctx.fillStyle = "#000000";
-                ctx.fillRect(0, 0, canvas.width, 480);
-
-                // Cálculo para escalar la imagen completa proporcionalmente en el área superior
-                let hRatio = canvas.width / img.width;
-                let vRatio = 480 / img.height;
-                let ratio = Math.min(hRatio, vRatio);
-                let centerShiftX = (canvas.width - img.width * ratio) / 2;
-                let centerShiftY = (480 - img.height * ratio) / 2;
-
-                ctx.drawImage(img, 0, 0, img.width, img.height, centerShiftX, centerShiftY, img.width * ratio, img.height * ratio);
-                
-                // Recuadro de diseño de marca y datos
-                const boxX = 15, boxY = 485, boxW = 570, boxH = 150;
-                ctx.fillStyle = "rgba(5, 8, 20, 0.96)";
-                ctx.strokeStyle = "#00f3ff";
-                ctx.lineWidth = 2;
-                ctx.fillRect(boxX, boxY, boxW, boxH);
-                ctx.strokeRect(boxX, boxY, boxW, boxH);
-
-                ctx.font = "bold 18px 'Orbitron', monospace";
-                ctx.fillStyle = "#00f3ff";
-                ctx.fillText(localStorage.getItem('ventaniya_name'), boxX + 20, boxY + 30);
-
-                ctx.font = "bold 12px 'Share Tech Mono', monospace";
-                ctx.fillStyle = "#ffffff";
-                ctx.fillText(localStorage.getItem('ventaniya_phone'), boxX + 20, boxY + 55);
-                ctx.fillText(localStorage.getItem('ventaniya_address'), boxX + 20, boxY + 75);
-
-                ctx.fillStyle = "#ff007f";
-                ctx.fillText(localStorage.getItem('ventaniya_msg'), boxX + 20, boxY + 95);
-
-                const now = new Date();
-                const timeString = now.toISOString().replace('T', ' ').substring(0, 23) + `.${String(now.getMilliseconds()).padStart(3, '0')}`;
-                const hashId = 'VTN-ATOMIC-' + Math.random().toString(36).substring(2, 10).toUpperCase() + '-' + now.getTime();
-
-                ctx.font = "10px 'Share Tech Mono', monospace";
-                ctx.fillStyle = "#00f3ff";
-                ctx.fillText(`TIMESTAMP: ${timeString} UTC`, boxX + 20, boxY + 118);
-                ctx.fillStyle = "#8ab4f8";
-                ctx.fillText(`HASH ID: ${hashId}`, boxX + 20, boxY + 135);
-
-                const link = document.createElement('a');
-                link.download = `Estampa-VentaniYA-${now.getTime()}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                msg.textContent = "";
-            };
-        }, 200);
+    document.getElementById('btnResetDefault').onclick = () => {
+        if(confirm("¿Restaurar imagen guía inicial?")) {
+            listaImagenes = defaultImages;
+            localStorage.setItem('ventaniya_imagenes_db', JSON.stringify(listaImagenes));
+            selectedIndex = 0;
+            inicializarSistema();
+        }
     };
+
+    function imprimirSeleccionados() {
+        const seleccionadas = document.querySelectorAll('.print-selected-cell');
+        if(seleccionadas.length === 0) {
+            alert("Por favor, marca al menos una casilla 'Imprimir' en los avisos que deseas mandar a la impresora.");
+            return;
+        }
+        window.print();
+    }
 
     inicializarSistema();
 </script>
