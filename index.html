@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartelera VentaniYA - Múltiples Avisos en Pantalla</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-white: #ffffff;
+            --neon-pink: #ff007f;
+            --bg-dark: #050814;
+            --panel-bg: #0b1120;
+            --border-glow: 0 0 15px rgba(0, 243, 255, 0.4);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--neon-white);
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(180deg, #0a1128 0%, #050814 100%);
+            border-bottom: 2px solid var(--neon-blue);
+            box-shadow: var(--border-glow);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 8px var(--neon-blue);
+            letter-spacing: 2px;
+        }
+
+        .brand p { font-size: 0.85rem; color: #8ab4f8; letter-spacing: 1px; }
+
+        .casio-clock-container {
+            background: #000;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3) inset, 0 0 10px var(--neon-blue);
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-align: right;
+        }
+
+        .time-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            letter-spacing: 2px;
+        }
+
+        .date-display {
+            font-size: 0.85rem;
+            color: var(--neon-white);
+            text-shadow: 0 0 8px var(--neon-white);
+            letter-spacing: 1px;
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            flex: 1;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 1100px) {
+            .main-layout { grid-template-columns: 1fr; }
+        }
+
+        .display-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--neon-blue);
+            border-left: 4px solid var(--neon-blue);
+            padding-left: 10px;
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        /* GRILLA MULTIPLE: Mínimo 25 en pantalla (5 columnas o responsive) */
+        .cartelera-multigrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            background: #000;
+            border: 2px solid var(--neon-blue);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .cartelera-multigrid::-webkit-scrollbar { width: 8px; }
+        .cartelera-multigrid::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 4px; }
+
+        /* CADA CARTEL INDIVIDUAL DENTRO DE LA GRILLA */
+        .cartel-cell {
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-blue);
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
+        }
+
+        .cartel-img-container {
+            width: 100%;
+            height: 150px;
+            background: #000;
+            position: relative;
+        }
+
+        .cartel-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .cartel-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            border: 1px solid var(--neon-blue);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            background: rgba(0,0,0,0.8);
+            color: var(--neon-blue);
+            font-size: 6px;
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        .cartel-info-box {
+            padding: 10px;
+            background: rgba(5, 8, 20, 0.95);
+            border-top: 1px solid var(--neon-blue);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .c-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            color: var(--neon-blue);
+            text-shadow: 0 0 4px var(--neon-blue);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .c-detail {
+            font-size: 0.72rem;
+            color: var(--neon-white);
+        }
+
+        .c-msg {
+            font-size: 0.72rem;
+            color: var(--neon-pink);
+            text-shadow: 0 0 4px var(--neon-pink);
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .gallery-section { display: flex; flex-direction: column; gap: 15px; }
+
+        .grid-estampas {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 8px;
+            max-height: 35vh;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .grid-estampas::-webkit-scrollbar { width: 6px; }
+        .grid-estampas::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 3px; }
+
+        .estampa-card {
+            background: var(--panel-bg);
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .estampa-card:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+        }
+
+        .estampa-card.selected {
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 12px var(--neon-pink);
+        }
+
+        .estampa-thumb { width: 100%; height: 90px; object-fit: cover; background: #000; display: block; }
+        .estampa-info { padding: 4px; font-size: 0.65rem; text-align: center; }
+        .estampa-name { color: var(--neon-blue); font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .editor-panel {
+            background: var(--panel-bg);
+            border: 2px solid var(--neon-blue);
+            box-shadow: var(--border-glow);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            height: fit-content;
+        }
+
+        .editor-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.05rem;
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink);
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 6px;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 0.8rem; color: var(--neon-blue); letter-spacing: 1px; font-weight: bold; }
+        
+        .form-group input {
+            background: #000;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-white);
+            padding: 8px;
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.95rem;
+        }
+
+        .btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .btn-action {
+            background: linear-gradient(90deg, #00f3ff, #0077ff);
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            border: none;
+            padding: 10px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 0.7rem;
+        }
+
+        .btn-action:hover { background: #fff; color: #000; box-shadow: 0 0 15px #fff; }
+
+        .btn-secondary {
+            background: linear-gradient(90deg, #ff007f, #aa0055);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+        }
+        .btn-secondary:hover { background: #fff; color: #000; box-shadow: 0 0 15px #fff; }
+
+        .status-msg {
+            font-size: 0.75rem;
+            color: #00f3ff;
+            text-align: center;
+            min-height: 1rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <h1>VENTANIYA</h1>
+            <p>CARTELERA MULTI-AVISOS EN VIVO</p>
+        </div>
+        <div class="casio-clock-container">
+            <div id="live-time" class="time-display">00:00:00.000</div>
+            <div id="live-date" class="date-display">00.XXX.0000</div>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <!-- PANTALLA PRINCIPAL: GRILLA MULTIPLE (25 o más visibles simultáneamente) -->
+        <div class="display-section">
+            <div class="section-title">Cartelera en Vivo (Múltiples Avisos Simultáneos)</div>
+            <div class="cartelera-multigrid" id="multigridContainer">
+                <div style="color: var(--neon-blue); padding: 15px;">Cargando grilla de la cartelera...</div>
+            </div>
+        </div>
+
+        <!-- PANEL DE CONTROL -->
+        <div class="editor-panel">
+            <div class="editor-title">Panel de Control de Avisos</div>
+            
+            <div class="form-group">
+                <label>Nombre del Comercio:</label>
+                <input type="text" id="sponsorName" value="COMERCIO AUSPICIANTE">
+            </div>
+
+            <div class="form-group">
+                <label>Teléfono:</label>
+                <input type="text" id="sponsorPhone" value="+54 9 11 0000-0000">
+            </div>
+
+            <div class="form-group">
+                <label>Dirección:</label>
+                <input type="text" id="sponsorAddress" value="Av. Principal 123">
+            </div>
+
+            <div class="form-group">
+                <label>Instagram / Mensaje:</label>
+                <input type="text" id="sponsorMsg" value="@tucomercio">
+            </div>
+
+            <div class="section-title" style="margin-top: 5px; font-size: 0.95rem;">Seleccionar Estampa Destacada:</div>
+            <div class="grid-estampas" id="gridEstampas"></div>
+
+            <div class="status-msg" id="statusMsg"></div>
+
+            <!-- BOTÓN 1: Deja fijo el aviso en la grilla. BOTÓN 2: Descarga -->
+            <div class="btn-container">
+                <button class="btn-action" id="btnSetFixed">1. Dejar Fijo en Grilla</button>
+                <button class="btn-action btn-secondary" id="btnDownload">2. Descargar Todo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas oculto para procesar la descarga general si se requiere -->
+    <canvas id="hidden-canvas" style="display:none;"></canvas>
+
+    <script>
+        const mesesShort = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SET", "OCT", "NOV", "DIC"];
+
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            const ms = String(now.getMilliseconds()).padStart(3, '0');
+            document.getElementById('live-time').textContent = `${h}:${m}:${s}.${ms}`;
+
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = mesesShort[now.getMonth()];
+            const year = now.getFullYear();
+            document.getElementById('live-date').textContent = `${day}.${month}.${year}`;
+        }
+        setInterval(updateClock, 30);
+
+        let listaImagenesGlobal = [];
+        let selectedPath = null;
+        const gridSelector = document.getElementById('gridEstampas');
+        const multigridContainer = document.getElementById('multigridContainer');
+
+        // Cargar datos guardados si existen
+        if(localStorage.getItem('ventaniya_name')) document.getElementById('sponsorName').value = localStorage.getItem('ventaniya_name');
+        if(localStorage.getItem('ventaniya_phone')) document.getElementById('sponsorPhone').value = localStorage.getItem('ventaniya_phone');
+        if(localStorage.getItem('ventaniya_address')) document.getElementById('sponsorAddress').value = localStorage.getItem('ventaniya_address');
+        if(localStorage.getItem('ventaniya_msg')) document.getElementById('sponsorMsg').value = localStorage.getItem('ventaniya_msg');
+
+        async function cargarRepositorioAutomatico() {
+            try {
+                const response = await fetch('https://api.github.com/repos/ventaniyasoluciones-blip/carteleratres/contents');
+                const files = await response.json();
+                listaImagenesGlobal = files.filter(file => file.type === 'file' && /\.(png|jpg|jpeg)$/i.test(file.name));
+
+                gridSelector.innerHTML = '';
+                if (listaImagenesGlobal.length === 0) {
+                    gridSelector.innerHTML = '<div style="color: var(--neon-pink);">No hay imágenes.</div>';
+                    return;
+                }
+
+                let savedImage = localStorage.getItem('ventaniya_image') || listaImagenesGlobal[0].name;
+
+                // Llenar selector lateral de estampas
+                listaImagenesGlobal.forEach((file) => {
+                    const card = document.createElement('div');
+                    card.className = `estampa-card ${file.name === savedImage ? 'selected' : ''}`;
+                    card.innerHTML = `
+                        <img class="estampa-thumb" src="${file.name}" alt="${file.name}" crossorigin="anonymous">
+                        <div class="estampa-info"><div class="estampa-name">${file.name}</div></div>
+                    `;
+
+                    card.addEventListener('click', () => {
+                        document.querySelectorAll('.estampa-card').forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                        selectedPath = file.name;
+                    });
+
+                    gridSelector.appendChild(card);
+
+                    if (file.name === savedImage) {
+                        selectedPath = file.name;
+                    }
+                });
+
+                if (!selectedPath && listaImagenesGlobal.length > 0) {
+                    selectedPath = listaImagenesGlobal[0].name;
+                }
+
+                // Renderizar la grilla principal con todos los avisos distribuidos
+                renderMultigrid();
+
+            } catch (error) {
+                multigridContainer.innerHTML = '<div style="color: var(--neon-pink);">Error al conectar con el repositorio.</div>';
+            }
+        }
+
+        function renderMultigrid() {
+            multigridContainer.innerHTML = '';
+
+            // Recuperar los datos fijos guardados
+            const sName = (localStorage.getItem('ventaniya_name') || "COMERCIO AUSPICIANTE").toUpperCase();
+            const sPhone = localStorage.getItem('ventaniya_phone') || "+54 9 11 0000-0000";
+            const sAddress = localStorage.getItem('ventaniya_address') || "Av. Principal 123";
+            const sMsg = localStorage.getItem('ventaniya_msg') || "@tucomercio";
+            const featuredImage = localStorage.getItem('ventaniya_image') || selectedPath;
+
+            // Asegurarnos de mostrar al menos 25 casilleros (si hay menos imágenes en el repo, se repiten o completan)
+            const totalCeldas = Math.max(25, listaImagenesGlobal.length);
+
+            for (let i = 0; i < totalCeldas; i++) {
+                // Asignar imagen del repositorio en bucle si supera las 100
+                const fileObj = listaImagenesGlobal[i % listaImagenesGlobal.length];
+                const imgSource = fileObj ? fileObj.name : '';
+
+                const cell = document.createElement('div');
+                cell.className = 'cartel-cell';
+
+                // Verificamos si esta celda corresponde a la estampa destacada elegida por el usuario
+                const esDestacada = (imgSource === featuredImage);
+
+                cell.innerHTML = `
+                    <div class="cartel-img-container">
+                        <img src="${imgSource}" alt="Estampa" crossorigin="anonymous">
+                        <div class="cartel-badge">VTN<br>${i+1}</div>
+                    </div>
+                    <div class="cartel-info-box">
+                        <div class="c-name">${esDestacada ? sName : `COMERCIO #${i+1}`}</div>
+                        <div class="c-detail">${esDestacada ? sPhone : 'Tel: Disponible'}</div>
+                        <div class="c-detail">${esDestacada ? sAddress : 'Zona Comercial'}</div>
+                        <div class="c-msg">${esDestacada ? sMsg : '@espacio_libre'}</div>
+                    </div>
+                `;
+                multigridContainer.appendChild(cell);
+            }
+        }
+
+        // BOTÓN 1: Guarda el aviso y lo fija de inmediato en la grilla múltiple de la pantalla
+        document.getElementById('btnSetFixed').onclick = () => {
+            if(!selectedPath) return;
+            localStorage.setItem('ventaniya_name', document.getElementById('sponsorName').value);
+            localStorage.setItem('ventaniya_phone', document.getElementById('sponsorPhone').value);
+            localStorage.setItem('ventaniya_address', document.getElementById('sponsorAddress').value);
+            localStorage.setItem('ventaniya_msg', document.getElementById('sponsorMsg').value);
+            localStorage.setItem('ventaniya_image', selectedPath);
+
+            renderMultigrid();
+            const msg = document.getElementById('statusMsg');
+            msg.textContent = "¡Aviso fijado en la grilla de la pantalla principal!";
+            setTimeout(() => { msg.textContent = ""; }, 3500);
+        };
+
+        // BOTÓN 2: Descarga la captura o aviso principal
+        document.getElementById('btnDownload').onclick = () => {
+            renderMultigrid();
+            const msg = document.getElementById('statusMsg');
+            msg.textContent = "Preparando descarga de la cartelera...";
+            setTimeout(() => {
+                // Generar descarga basada en la estampa destacada con su cartel
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.src = localStorage.getItem('ventaniya_image') || selectedPath;
+                
+                img.onload = () => {
+                    const canvas = document.getElementById('hidden-canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 600;
+                    canvas.height = 600;
+
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = "rgba(5, 8, 20, 0.3)";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // Recuadro publicitario en la descarga
+                    const boxX = 20, boxY = canvas.height - 130, boxW = 560, boxH = 100;
+                    ctx.fillStyle = "rgba(5, 8, 20, 0.95)";
+                    ctx.strokeStyle = "#00f3ff";
+                    ctx.lineWidth = 2;
+                    ctx.fillRect(boxX, boxY, boxW, boxH);
+                    ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+                    ctx.font = "bold 20px 'Orbitron', monospace";
+                    ctx.fillStyle = "#00f3ff";
+                    ctx.fillText(localStorage.getItem('ventaniya_name'), boxX + 20, boxY + 30);
+
+                    ctx.font = "bold 13px 'Share Tech Mono', monospace";
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillText(localStorage.getItem('ventaniya_phone'), boxX + 20, boxY + 55);
+                    ctx.fillText(localStorage.getItem('ventaniya_address'), boxX + 20, boxY + 75);
+
+                    ctx.fillStyle = "#ff007f";
+                    ctx.fillText(localStorage.getItem('ventaniya_msg'), boxX + 20, boxY + 95);
+
+                    const link = document.createElement('a');
+                    link.download = `Cartelera-MultiAviso.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    msg.textContent = "";
+                };
+            }, 200);
+        };
+
+        cargarRepositorioAutomatico();
+    </script>
+</body>
+</html>
