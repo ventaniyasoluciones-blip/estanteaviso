@@ -78,10 +78,43 @@
             font-family: 'Orbitron', sans-serif;
             font-size: 0.8rem;
             text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            margin-top: 5px;
+            width: 100%;
         }
         .btn:hover {
             background: #fff;
             box-shadow: 0 0 15px #fff;
+        }
+        /* Estilos para el panel de edición y la sección de avisos fijados */
+        .editor-section, .fijados-section {
+            max-width: 1200px;
+            margin: 40px auto 20px auto;
+            border-top: 2px dashed #00f3ff;
+            padding-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            background: #050814;
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            box-sizing: border-box;
+        }
+        canvas {
+            display: none; /* Se usa internamente para procesar las imágenes con sellos y textos */
         }
     </style>
 </head>
@@ -92,35 +125,221 @@
         <p>Estampiyas y carteles para redes sociales</p>
     </header>
 
-    <div class="grid" id="estanteGrid"></div>
+    <!-- GRILLA AUTOMÁTICA DESDE GITHUB -->
+    <div class="grid" id="estanteGrid">
+        <div class="card"><div class="error-msg">Cargando imágenes del repositorio...</div></div>
+    </div>
+
+    <!-- SECCIÓN DE PERSONALIZACIÓN Y FIJADO DE AVISOS -->
+    <div class="editor-section">
+        <h2>🛠️ Personalizar y Estampar Aviso</h2>
+        <div style="background: #0b1120; border: 2px solid #0077ff; border-radius: 8px; padding: 20px; max-width: 600px; margin: 0 auto;">
+            <div class="form-group">
+                <label for="selectImagen">1. Seleccioná una imagen del estante:</label>
+                <select id="selectImagen"></select>
+            </div>
+            <div class="form-group">
+                <label for="textoAviso">2. Escribí el texto del aviso:</label>
+                <textarea id="textoAviso" rows="3" placeholder="Ej: ¡Gran liquidación este fin de semana!"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="logoAvisador">3. Subir logo del avisador (opcional):</label>
+                <input type="file" id="logoAvisador" accept="image/*">
+            </div>
+            <button class="btn" id="btnGenerarAviso">✨ Generar y Fijar Aviso</button>
+        </div>
+    </div>
+
+    <!-- SECCIÓN DE AVISOS FIJADOS EDITADOS -->
+    <div class="fijados-section">
+        <h2>📌 Ventana de Avisos Fijados (Listos para Descarga)</h2>
+        <div class="grid" id="fijadosGrid">
+            <!-- Aquí aparecerán los avisos personalizados -->
+        </div>
+    </div>
+
+    <!-- Canvas oculto para procesar el estampado -->
+    <canvas id="canvasProcesamiento"></canvas>
 
     <script>
-        // =========================================================================
-        // ESCRIBÍ ACÁ EXACTAMENTE CÓMO SE LLAMAN TUS ARCHIVOS
-        // (Respetando mayúsculas y minúsculas tal cual los subiste a GitHub)
-        // =========================================================================
-        const listaEstampiyas = [
-            "estampiya1.jpg",
-            "estampiya2.jpg",
-            "aviso1.png"
-        ];
+        // Configuración de tu repositorio de GitHub
+        const usuarioRepo = "ventaniyasoluciones-blip";
+        const nombreRepo = "estanteaviso";
+        const carpetaRepo = ""; // Dejar vacío si las imágenes están en la raíz
 
-        const grid = document.getElementById('estanteGrid');
-
-        listaEstampiyas.forEach(nombreArchivo => {
-            const card = document.createElement('div');
-            card.className = 'card';
+        // Función para leer automáticamente las imágenes del repositorio usando la API de GitHub
+        async function cargarImagenesGitHub() {
+            const grid = document.getElementById('estanteGrid');
+            const select = document.getElementById('selectImagen');
             
-            card.innerHTML = `
+            const urlApi = `https://api.github.com/repos/${usuarioRepo}/${nombreRepo}/contents/${carpetaRepo}`;
+
+            try {
+                const response = await fetch(urlApi);
+                if (!response.ok) throw new Error("No se pudo conectar con la API de GitHub");
+                
+                const archivos = await response.json();
+                
+                // Filtrar solo archivos de imagen comunes (.jpg, .jpeg, .png, .webp)
+                const imagenes = archivos.filter(file => {
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    return ['jpg', 'jpeg', 'png', 'webp'].includes(ext);
+                });
+
+                grid.innerHTML = '';
+                select.innerHTML = '';
+
+                if (imagenes.length === 0) {
+                    grid.innerHTML = '<div class="card"><div class="error-msg">No se encontraron imágenes en el repositorio.</div></div>';
+                    return;
+                }
+
+                imagenes.forEach(img => {
+                    const nombreArchivo = img.name;
+                    const urlArchivo = img.download_url;
+
+                    // Agregar tarjeta a la grilla principal
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="img-container">
+                            <img src="${urlArchivo}" alt="${nombreArchivo}">
+                        </div>
+                        <div>
+                            <a href="${urlArchivo}" download="${nombreArchivo}" class="btn" target="_blank">📥 Descargar Original</a>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+
+                    // Agregar opción al selector del personalizador
+                    const option = document.createElement('option');
+                    option.value = urlArchivo;
+                    option.textContent = nombreArchivo;
+                    select.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error(error);
+                grid.innerHTML = '<div class="card"><div class="error-msg">Error al cargar automáticamente las imágenes.<br><small>Verificá la conexión o los nombres de la API.</small></div></div>';
+            }
+        }
+
+        // Función para estampar la imagen con texto, línea de tiempo, hash y logo opcional
+        document.getElementById('btnGenerarAviso').addEventListener('click', async () => {
+            const select = document.getElementById('selectImagen');
+            const textoAviso = document.getElementById('textoAviso').value;
+            const inputLogo = document.getElementById('logoAvisador');
+
+            if (!select.value) {
+                alert("Por favor seleccioná una imagen.");
+                return;
+            }
+
+            const imgUrl = select.value;
+            const canvas = document.getElementById('canvasProcesamiento');
+            const ctx = canvas.getContext('2d');
+
+            // Cargar imagen principal
+            const imgBase = new Image();
+            imgBase.crossOrigin = "anonymous";
+            imgBase.src = imgUrl;
+
+            imgBase.onload = async () => {
+                // Definir dimensiones fijas de salida para el banner procesado
+                canvas.width = 1080;
+                canvas.height = 1080;
+
+                // Dibujar imagen base adaptada al canvas
+                ctx.drawImage(imgBase, 0, 0, canvas.width, canvas.height);
+
+                // --- 1. APLICAR ESTAMPADO (Línea de tiempo y Sello Hash) ---
+                const fechaActual = new Date().toLocaleString();
+                const hashAleatorio = "HASH-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+                // Franja inferior para datos técnicos y texto
+                ctx.fillStyle = "rgba(5, 8, 20, 0.85)";
+                ctx.fillRect(0, canvas.height - 180, canvas.width, 180);
+
+                // Línea divisora neón
+                ctx.strokeStyle = "#00f3ff";
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height - 180);
+                ctx.lineTo(canvas.width, canvas.height - 180);
+                ctx.stroke();
+
+                // Escribir texto personalizado del aviso (si hay)
+                if (textoAviso.trim() !== "") {
+                    // Franja superior translúcida para el aviso
+                    ctx.fillStyle = "rgba(0, 243, 255, 0.15)";
+                    ctx.fillRect(0, 40, canvas.width, 120);
+                    ctx.strokeStyle = "#00f3ff";
+                    ctx.strokeRect(0, 40, canvas.width, 120);
+
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "bold 32px 'Share Tech Mono', monospace";
+                    ctx.textAlign = "center";
+                    
+                    // Manejo básico de texto multilínea centrado
+                    ctx.fillText(textoAviso, canvas.width / 2, 115);
+                }
+
+                // Escribir Línea de tiempo y Sello Hash abajo
+                ctx.fillStyle = "#00f3ff";
+                ctx.font = "20px 'Share Tech Mono', monospace";
+                ctx.textAlign = "left";
+                ctx.fillText(`📅 TIME: ${fechaActual}`, 30, canvas.height - 120);
+                ctx.fillText(`🔒 HASH: ${hashAleatorio}`, 30, canvas.height - 80);
+                ctx.fillText(`⚡ VENTANIYA - ESTANTE DE AVISOS`, 30, canvas.height - 40);
+
+                // --- 2. INTEGRAR LOGO DEL AVISADOR (Si se subió uno) ---
+                if (inputLogo.files && inputLogo.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imgLogo = new Image();
+                        imgLogo.src = e.target.result;
+                        imgLogo.onload = function() {
+                            // Dibujar logo en la esquina inferior derecha
+                            const logoSize = 120;
+                            ctx.drawImage(imgLogo, canvas.width - logoSize - 30, canvas.height - logoSize - 30, logoSize, logoSize);
+                            finalizarGeneracion(canvas.toDataURL("image/png"), textoAviso || "Aviso personalizado");
+                        }
+                    }
+                    reader.readAsDataURL(inputLogo.files[0]);
+                } else {
+                    finalizarGeneracion(canvas.toDataURL("image/png"), textoAviso || "Aviso personalizado");
+                }
+            };
+        });
+
+        function finalizarGeneracion(dataUrl, descripcion) {
+            const fijadosGrid = document.getElementById('fijadosGrid');
+
+            // Crear tarjeta en la ventana de avisos fijados
+            const cardFijada = document.createElement('div');
+            cardFijada.className = 'card';
+            
+            const nombreGenerado = `aviso-editado-${Date.now()}.png`;
+
+            cardFijada.innerHTML = `
                 <div class="img-container">
-                    <img src="${nombreArchivo}" alt="${nombreArchivo}" onerror="this.parentElement.innerHTML='<div class=\'error-msg\'>No se encuentra el archivo:<br><b>${nombreArchivo}</b><br><small>Revisá mayúsculas y formato en GitHub</small></div>'">
+                    <img src="${dataUrl}" alt="Aviso Fijado">
+                </div>
+                <div style="font-size: 0.8rem; margin-bottom: 10px; color: #fff; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    💬 ${descripcion}
                 </div>
                 <div>
-                    <a href="${nombreArchivo}" download="${nombreArchivo}" class="btn" target="_blank">📥 Descargar</a>
+                    <a href="${dataUrl}" download="${nombreGenerado}" class="btn">📥 Descargar Estampado</a>
                 </div>
             `;
-            grid.appendChild(card);
-        });
+
+            // Agregar al principio de la sección de fijados
+            fijadosGrid.prepend(cardFijada);
+            alert("¡Aviso generado y fijado con éxito en la sección inferior!");
+        }
+
+        // Ejecutar la carga automática al iniciar la página
+        cargarImagenesGitHub();
     </script>
 
 </body>
