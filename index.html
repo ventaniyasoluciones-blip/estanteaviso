@@ -87,7 +87,12 @@
             background: #fff;
             box-shadow: 0 0 15px #fff;
         }
-        .editor-section {
+        .btn-borrar {
+            background: linear-gradient(90deg, #ff007f, #99004c);
+            color: #fff;
+            margin-top: 5px;
+        }
+        .editor-section, .fijados-section {
             max-width: 1200px;
             margin: 40px auto 20px auto;
             border-top: 2px dashed #00f3ff;
@@ -121,10 +126,10 @@
 
     <header>
         <h1>VENTANIYA - ESTANTE DE AVISOS</h1>
-        <p>Estampiyas y carteles para redes sociales</p>
+        <p>Estampiyas y carteles para comercios (Modo Local Seguro)</p>
     </header>
 
-    <!-- PANEL PARA SUBIR Y ESTAMPAR NUEVOS AVISOS (Exclusivo Admin) -->
+    <!-- PANEL DE CREACIÓN DE AVISOS -->
     <div class="editor-section">
         <h2>🛠️ Subir Imagen Limpia y Estampar Aviso</h2>
         <div style="background: #0b1120; border: 2px solid #0077ff; border-radius: 8px; padding: 20px; max-width: 600px; margin: 0 auto;">
@@ -140,78 +145,26 @@
                 <label for="logoAvisador">3. Subir logo del avisador (opcional):</label>
                 <input type="file" id="logoAvisador" accept="image/*">
             </div>
-            <button class="btn" id="btnProcesarYSubir">✨ Estampar y Enviar al Estante</button>
+            <button class="btn" id="btnProcesarYGuardar">✨ Estampar y Guardar en el Estante</button>
         </div>
     </div>
 
-    <!-- GRILLA AUTOMÁTICA DEL ESTANTE (Lo que ve todo el mundo) -->
-    <div style="max-width: 1200px; margin: 40px auto 20px auto;">
-        <h2>📌 Estante Público de Avisos</h2>
-    </div>
-    <div class="grid" id="estanteGrid">
-        <div class="card"><div class="error-msg">Cargando imágenes del repositorio...</div></div>
+    <!-- SECCIÓN DE AVISOS GUARDADOS EN EL ESTANTE LOCAL -->
+    <div class="fijados-section">
+        <h2>📌 Estante de Avisos Listos</h2>
+        <div class="grid" id="estanteGrid">
+            <!-- Aquí aparecerán tus avisos guardados -->
+        </div>
     </div>
 
     <canvas id="canvasProcesamiento"></canvas>
 
     <script>
-        // Configuración de tu repositorio
-        const usuarioRepo = "ventaniyasoluciones-blip";
-        const nombreRepo = "estanteaviso";
-        const carpetaRepo = ""; 
+        document.addEventListener("DOMContentLoaded", () => {
+            cargarAvisosLocales();
+        });
 
-        // ⚠️ PEGA AQUÍ TU TOKEN PERSONAL DE GITHUB (Classic Token con permiso 'repo')
-        const tokenGitHub = "AQUÍ_PEGAS_TU_TOKEN_DE_GITHUB";
-
-        // Función para leer automáticamente todas las imágenes que ya están en el repositorio
-        async function cargarImagenesGitHub() {
-            const grid = document.getElementById('estanteGrid');
-            const urlApi = `https://api.github.com/repos/${usuarioRepo}/${nombreRepo}/contents/${carpetaRepo}`;
-
-            try {
-                const response = await fetch(urlApi);
-                if (!response.ok) throw new Error("No se pudo conectar con la API de GitHub");
-                
-                const archivos = await response.json();
-                const imagenes = archivos.filter(file => {
-                    const ext = file.name.split('.').pop().toLowerCase();
-                    return ['jpg', 'jpeg', 'png', 'webp'].includes(ext);
-                });
-
-                grid.innerHTML = '';
-
-                if (imagenes.length === 0) {
-                    grid.innerHTML = '<div class="card"><div class="error-msg">El estante está vacío. Subí tu primer aviso arriba.</div></div>';
-                    return;
-                }
-
-                // Mostrar las imágenes ordenadas de más nuevas a más viejas
-                imagenes.reverse().forEach(img => {
-                    const nombreArchivo = img.name;
-                    const urlArchivo = img.download_url;
-
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <div class="img-container">
-                            <img src="${urlArchivo}" alt="${nombreArchivo}">
-                        </div>
-                        <div>
-                            <p style="font-size: 0.70rem; margin: 5px 0; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">📄 ${nombreArchivo}</p>
-                            <a href="${urlArchivo}" download="${nombreArchivo}" class="btn" target="_blank">📥 Descargar</a>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
-
-            } catch (error) {
-                console.error(error);
-                grid.innerHTML = '<div class="card"><div class="error-msg">Error al cargar las imágenes del repositorio.</div></div>';
-            }
-        }
-
-        // Botón principal: Toma la imagen limpia de afuera, le aplica el sello y la sube al repo
-        document.getElementById('btnProcesarYSubir').addEventListener('click', () => {
+        document.getElementById('btnProcesarYGuardar').addEventListener('click', () => {
             const inputImagenLimpia = document.getElementById('imagenLimpia');
             const textoAviso = document.getElementById('textoAviso').value;
             const inputLogo = document.getElementById('logoAvisador');
@@ -221,12 +174,6 @@
                 return;
             }
 
-            if (tokenGitHub === "AQUÍ_PEGAS_TU_TOKEN_DE_GITHUB" || !tokenGitHub) {
-                alert("⚠️ Falta configurar el token de GitHub en el código JavaScript.");
-                return;
-            }
-
-            // Leer la imagen limpia que subiste de afuera
             const readerLimpia = new FileReader();
             readerLimpia.onload = function(e) {
                 const imgBase = new Image();
@@ -243,7 +190,7 @@
                     const fechaActual = new Date().toLocaleString();
                     const hashAleatorio = "HASH-" + Math.random().toString(36).substring(2, 10).toUpperCase();
 
-                    // Franja inferior para datos técnicos
+                    // Franja inferior técnica
                     ctx.fillStyle = "rgba(5, 8, 20, 0.85)";
                     ctx.fillRect(0, canvas.height - 180, canvas.width, 180);
 
@@ -254,7 +201,7 @@
                     ctx.lineTo(canvas.width, canvas.height - 180);
                     ctx.stroke();
 
-                    // Texto personalizado superior
+                    // Texto superior personalizado
                     if (textoAviso.trim() !== "") {
                         ctx.fillStyle = "rgba(0, 243, 255, 0.15)";
                         ctx.fillRect(0, 40, canvas.width, 120);
@@ -275,10 +222,23 @@
                     ctx.fillText(`🔒 HASH: ${hashAleatorio}`, 30, canvas.height - 80);
                     ctx.fillText(`⚡ VENTANIYA - ESTANTE DE AVISOS`, 30, canvas.height - 40);
 
-                    // Función para procesar el logo opcional y mandar a GitHub
-                    const finalizarYSubir = (dataUrlFinal) => {
-                        const nombreNuevoArchivo = `aviso-${Date.now()}.png`;
-                        subirAGitHub(dataUrlFinal, nombreNuevoArchivo);
+                    const guardarResultado = (dataUrlFinal) => {
+                        const nuevoAviso = {
+                            id: Date.now(),
+                            imagen: dataUrlFinal,
+                            descripcion: textoAviso.trim() !== "" ? textoAviso : "Aviso comercial"
+                        };
+
+                        let avisosGuardados = JSON.parse(localStorage.getItem('ventaniya_estante_seguro')) || [];
+                        avisosGuardados.unshift(nuevoAviso);
+                        localStorage.setItem('ventaniya_estante_seguro', JSON.stringify(avisosGuardados));
+
+                        document.getElementById('imagenLimpia').value = '';
+                        document.getElementById('textoAviso').value = '';
+                        document.getElementById('logoAvisador').value = '';
+
+                        cargarAvisosLocales();
+                        alert("¡Aviso estampado con éxito! Ya lo podés descargar para entregar o publicar.");
                     };
 
                     if (inputLogo.files && inputLogo.files[0]) {
@@ -289,59 +249,56 @@
                             imgLogo.onload = function() {
                                 const logoSize = 120;
                                 ctx.drawImage(imgLogo, canvas.width - logoSize - 30, canvas.height - logoSize - 30, logoSize, logoSize);
-                                finalizarYSubir(canvas.toDataURL("image/png"));
+                                guardarResultado(canvas.toDataURL("image/png"));
                             }
                         }
                         readerLogo.readAsDataURL(inputLogo.files[0]);
                     } else {
-                        finalizarYSubir(canvas.toDataURL("image/png"));
+                        guardarResultado(canvas.toDataURL("image/png"));
                     }
                 };
             };
             readerLimpia.readAsDataURL(inputImagenLimpia.files[0]);
         });
 
-        // Función que envía la imagen ya estampada a GitHub
-        async function subirAGitHub(dataUrl, nombreArchivo) {
-            alert("Estampando aviso y subiendo al repositorio... Aguardá un momento.");
-            
-            const base64Content = dataUrl.split(',')[1];
-            const urlApi = `https://api.github.com/repos/${usuarioRepo}/${nombreRepo}/contents/${nombreArchivo}`;
+        function cargarAvisosLocales() {
+            const grid = document.getElementById('estanteGrid');
+            grid.innerHTML = '';
 
-            try {
-                const response = await fetch(urlApi, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${tokenGitHub}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: `Nuevo aviso agregado al estante: ${nombreArchivo}`,
-                        content: base64Content
-                    })
-                });
+            let avisosGuardados = JSON.parse(localStorage.getItem('ventaniya_estante_seguro')) || [];
 
-                if (response.ok) {
-                    alert("¡Aviso publicado con éxito! Ya se encuentra en el estante público.");
-                    // Limpiar formulario
-                    document.getElementById('imagenLimpia').value = '';
-                    document.getElementById('textoAviso').value = '';
-                    document.getElementById('logoAvisador').value = '';
-                    // Recargar grilla
-                    cargarImagenesGitHub();
-                } else {
-                    const errorData = await response.json();
-                    console.error(errorData);
-                    alert("Error al subir a GitHub. Verificá los permisos del token.");
-                }
-            } catch (error) {
-                console.error("Error de red:", error);
-                alert("Ocurrió un error de conexión.");
+            if (avisosGuardados.length === 0) {
+                grid.innerHTML = '<div class="card"><div class="error-msg">El estante está vacío. Subí tu primer aviso arriba.</div></div>';
+                return;
             }
+
+            avisosGuardados.forEach(aviso => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="img-container">
+                        <img src="${aviso.imagen}" alt="Aviso Estampado">
+                    </div>
+                    <div style="font-size: 0.8rem; margin-bottom: 10px; color: #fff; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        💬 ${aviso.descripcion}
+                    </div>
+                    <div>
+                        <a href="${aviso.imagen}" download="aviso-ventaniya-${aviso.id}.png" class="btn">📥 Descargar Estampado</a>
+                        <button class="btn btn-borrar" onclick="borrarAviso(${aviso.id})">🗑️ Eliminar</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
         }
 
-        // Cargar estante al iniciar
-        cargarImagenesGitHub();
+        function borrarAviso(id) {
+            if (confirm("¿Estás seguro de eliminar este aviso del estante?")) {
+                let avisosGuardados = JSON.parse(localStorage.getItem('ventaniya_estante_seguro')) || [];
+                avisosGuardados = avisosGuardados.filter(aviso => aviso.id !== id);
+                localStorage.setItem('ventaniya_estante_seguro', JSON.stringify(avisosGuardados));
+                cargarAvisosLocales();
+            }
+        }
     </script>
 </body>
 </html>
